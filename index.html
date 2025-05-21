@@ -2,9 +2,10 @@
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>香港的士考試練習 | Hong Kong Taxi Exam Quiz</title>
+    <title>香港的士考試溫習 | Hong Kong Taxi Exam Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD-S6hFnx_VK5s-5h53mv0VAmmBCjYUvv4&callback=Function.prototype"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -25,17 +26,17 @@
             overflow: hidden;
         }
         .summary-map {
-            height: 200px;
-            width: 100%;
+            height: 300px;
+            width: 200%;
             border-radius: 0.5rem;
             overflow: hidden;
         }
     </style>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-3xl">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
         <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold mb-2 text-primary"><button onclick="window.location.href = window.location.href;">香港的士考試練習</button></h1>
+            <h1 class="text-3xl font-bold mb-2 text-primary"><button onclick="window.location.href = window.location.href;">香港的士考試溫習</button></h1>
             <h2 class="text-xl mb-4">Hong Kong Taxi Exam Practice</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400">基於的士筆試地方及路線試題小冊子</p>
         </header>
@@ -864,7 +865,6 @@
         let userAnswers = [];
         const questionsPerQuiz = 20; // Change this to adjust quiz length
         let quizQuestions = [];
-        let incorrectQuestions = [];
 
         // Mistakes storage - use localStorage to persist between sessions
         let savedMistakes = [];
@@ -985,7 +985,7 @@
                     
                     // Question info
                     const questionInfo = document.createElement('div');
-                    questionInfo.className = 'md:col-span-2';
+                    questionInfo.className = 'md:col-span-1';
                     
                     // Question header
                     const questionHeader = document.createElement('h3');
@@ -1011,7 +1011,7 @@
                     // User answer
                     const userAnswerEl = document.createElement('p');
                     userAnswerEl.className = 'text-red-600 dark:text-red-400';
-                    userAnswerEl.innerHTML = `<strong>你的答案:</strong> ${mistake.userAnswer}`;
+                    userAnswerEl.innerHTML = `<strong>你的答案:</strong> ${mistake.userAnswer || "未作答"}`;
                     questionInfo.appendChild(userAnswerEl);
                     
                     gridDiv.appendChild(questionInfo);
@@ -1030,81 +1030,56 @@
                             const correctCoords = districtCoordinates[correctLocationKey] || districtCoordinates["default"];
                             
                             // Check if wrong answer exists
-                            const userCoords = districtCoordinates[mistake.userAnswer] || districtCoordinates["default"];
-                            
-                            // Create map
-                            const mistakeMap = new google.maps.Map(document.getElementById(`mistake-map-${index}`), {
-                                center: correctCoords,
-                                zoom: 14,
-                                mapTypeId: 'roadmap',
-                                mapTypeControl: false,
-                                streetViewControl: false,
-                                fullscreenControl: false
-                            });
-                            
+                            const userCoords = mistake.userAnswer && (districtCoordinates[mistake.userAnswer] || districtCoordinates["default"]);
+                            const mistakeMap = L.map(document.getElementById(`mistake-map-${index}`)).setView([correctCoords.lat, correctCoords.lng], 14);
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '© OpenStreetMap contributors'
+                            }).addTo(mistakeMap);
+
                             // Add marker for correct location
-                            const correctMarker = new google.maps.Marker({
-                                position: correctCoords,
-                                map: mistakeMap,
+                            const correctMarker = L.marker([correctCoords.lat, correctCoords.lng], {
                                 title: `${mistake.question.place}`,
-                                animation: google.maps.Animation.DROP,
-                                icon: {
-                                    path: google.maps.SymbolPath.CIRCLE,
-                                    fillColor: '#4CAF50',
-                                    fillOpacity: 1,
-                                    strokeWeight: 0,
-                                    scale: 8
-                                }
-                            });
-                            
-                            // Info window for correct location
-                            const correctInfoWindow = new google.maps.InfoWindow({
-                                content: `<div class="p-1">
-                                    <strong>${correctLocationKey}${mistake.question.place}</strong>
-                                </div>`
-                            });
-                            
-                            correctMarker.addListener('click', () => {
-                                correctInfoWindow.open(mistakeMap, correctMarker);
-                            });
-                            
+                                icon: L.divIcon({
+                                    className: 'custom-div-icon',
+                                    html: `<div style="background-color:#4CAF50;width:16px;height:16px;border-radius:50%;"></div>`,
+                                    iconSize: [16, 16],
+                                    iconAnchor: [8, 8]
+                                })
+                            }).addTo(mistakeMap);
+
+                            // Popup for correct location
+                            correctMarker.bindPopup(`<div class="p-1">
+                                <strong>${correctLocationKey}${mistake.question.place}</strong>
+                            </div>`);
+
                             // Add marker for user's incorrect answer
-                            const incorrectMarker = new google.maps.Marker({
-                                position: userCoords,
-                                map: mistakeMap,
+                            const incorrectMarker = L.marker([userCoords.lat, userCoords.lng], {
                                 title: `${mistake.question.place} (你的選擇)`,
-                                animation: google.maps.Animation.DROP,
-                                icon: {
-                                    path: google.maps.SymbolPath.CIRCLE,
-                                    fillColor: '#F44336',
-                                    fillOpacity: 1,
-                                    strokeWeight: 0,
-                                    scale: 8
-                                }
-                            });
-                            
-                            // Info window for incorrect answer
-                            const incorrectInfoWindow = new google.maps.InfoWindow({
-                                content: `<div class="p-1">
-                                    <strong>${mistake.userAnswer}</strong>
-                                </div>`
-                            });
-                            
-                            incorrectMarker.addListener('click', () => {
-                                incorrectInfoWindow.open(mistakeMap, incorrectMarker);
-                            });
-                            
+                                icon: L.divIcon({
+                                    className: 'custom-div-icon',
+                                    html: `<div style="background-color:#F44336;width:16px;height:16px;border-radius:50%;"></div>`,
+                                    iconSize: [16, 16],
+                                    iconAnchor: [8, 8]
+                                })
+                            }).addTo(mistakeMap);
+
+                            // Popup for incorrect answer
+                            incorrectMarker.bindPopup(`<div class="p-1">
+                                <strong>${mistake.userAnswer}</strong>
+                            </div>`);
+
                             // Fit map to show both locations
-                            const bounds = new google.maps.LatLngBounds();
-                            bounds.extend(correctCoords);
-                            bounds.extend(userCoords);
+                            const bounds = L.latLngBounds(
+                                [correctCoords.lat, correctCoords.lng],
+                                [userCoords.lat, userCoords.lng]
+                            );
                             mistakeMap.fitBounds(bounds);
-                            
-                            // Open both info windows
+
+                            // Open both popups
                             setTimeout(() => {
-                                correctInfoWindow.open(mistakeMap, correctMarker);
+                                correctMarker.openPopup();
                                 setTimeout(() => {
-                                    incorrectInfoWindow.open(mistakeMap, incorrectMarker);
+                                    incorrectMarker.openPopup();
                                 }, 200);
                             }, 500);
                         }, 200 + (index * 100)); // Stagger map creation
@@ -1184,7 +1159,6 @@
             currentQuestionIndex = 0;
             score = 0;
             userAnswers = new Array(quizQuestions.length).fill(null);
-            incorrectQuestions = [];
             
             // Update UI
             totalQuestionsElement.textContent = questionsPerQuiz;
@@ -1390,9 +1364,6 @@
                 score++;
                 scoreElement.textContent = score;
             } else {
-                // Track incorrect questions for review
-                incorrectQuestions.push(currentQuestionIndex);
-                
                 // Save to mistakes history if incorrect
                 addMistake(currentQuestion, selectedOption);
             }
@@ -1465,130 +1436,93 @@
             
             // If map doesn't exist, create it
             if (!map) {
-                map = new google.maps.Map(mapElement, {
-                    center: correctCoords,
-                    zoom: 15,
-                    mapTypeId: 'roadmap',
-                    mapTypeControl: false,
-                    streetViewControl: false,
-                    fullscreenControl: false
-                });
+                map = L.map(mapElement).setView([correctCoords.lat, correctCoords.lng], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
             } else {
                 // Otherwise just update the center
-                map.setCenter(correctCoords);
-                map.setZoom(15);
+                map.setView([correctCoords.lat, correctCoords.lng], 15);
+                
+                // Clear any existing markers
+                map.eachLayer(function(layer) {
+                    if (layer instanceof L.Marker) {
+                        map.removeLayer(layer);
+                    }
+                });
             }
-            
-            // Clear any existing markers
-            if (map.markers) {
-                map.markers.forEach(marker => marker.setMap(null));
-            }
-            map.markers = [];
             
             // If we're showing both locations (incorrect answer scenario)
             if (isIncorrect && userCoords) {
                 // Add marker for correct location (green)
-                const correctMarker = new google.maps.Marker({
-                    position: correctCoords,
-                    map: map,
+                const correctMarker = L.marker([correctCoords.lat, correctCoords.lng], {
                     title: `${currentQuestion.place} (正確位置)`,
-                    animation: google.maps.Animation.DROP,
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        fillColor: '#4CAF50',
-                        fillOpacity: 1,
-                        strokeWeight: 0,
-                        scale: 10
-                    }
-                });
+                    icon: L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `<div style="background-color:#4CAF50;width:20px;height:20px;border-radius:50%;"></div>`,
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    })
+                }).addTo(map);
                 
                 // Add marker for incorrect location (red)
-                const incorrectMarker = new google.maps.Marker({
-                    position: userCoords,
-                    map: map,
+                const incorrectMarker = L.marker([userCoords.lat, userCoords.lng], {
                     title: `${currentQuestion.place} (你的選擇)`,
-                    animation: google.maps.Animation.DROP,
-                    icon: {
-                        path: google.maps.SymbolPath.CIRCLE,
-                        fillColor: '#F44336',
-                        fillOpacity: 1,
-                        strokeWeight: 0,
-                        scale: 10
-                    }
-                });
-                
-                map.markers = [correctMarker, incorrectMarker];
+                    icon: L.divIcon({
+                        className: 'custom-div-icon',
+                        html: `<div style="background-color:#F44336;width:20px;height:20px;border-radius:50%;"></div>`,
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    })
+                }).addTo(map);
                 
                 // Fit map to show both markers
-                const bounds = new google.maps.LatLngBounds();
-                bounds.extend(correctCoords);
-                bounds.extend(userCoords);
+                const bounds = L.latLngBounds(
+                    [correctCoords.lat, correctCoords.lng],
+                    [userCoords.lat, userCoords.lng]
+                );
                 map.fitBounds(bounds);
                 
-                // Add info windows
-                const correctInfoWindow = new google.maps.InfoWindow({
-                    content: `<div class="p-2">
-                        <strong>${correctLocationKey}${currentQuestion.place}</strong><br>
-                        <span class="text-green-600">✓ 正確位置</span>
-                    </div>`
-                });
+                // Add popups
+                correctMarker.bindPopup(`<div class="p-2">
+                    <strong>${correctLocationKey}${currentQuestion.place}</strong><br>
+                    <span class="text-green-600">✓ 正確位置</span>
+                </div>`);
                 
-                const incorrectInfoWindow = new google.maps.InfoWindow({
-                    content: `<div class="p-2">
-                        <strong>${userAnswer}</strong><br>
-                        <span class="text-red-600">✗ 你的選擇</span>
-                    </div>`
-                });
+                incorrectMarker.bindPopup(`<div class="p-2">
+                    <strong>${userAnswer}</strong><br>
+                    <span class="text-red-600">✗ 你的選擇</span>
+                </div>`);
                 
-                // Add click listeners
-                correctMarker.addListener('click', () => {
-                    correctInfoWindow.open(map, correctMarker);
-                });
-                
-                incorrectMarker.addListener('click', () => {
-                    incorrectInfoWindow.open(map, incorrectMarker);
-                });
-                
-                // Open both info windows
+                // Open both popups with a delay
                 setTimeout(() => {
-                    correctInfoWindow.open(map, correctMarker);
+                    correctMarker.openPopup();
                     // Slight delay for second window to avoid overlap/flickering
                     setTimeout(() => {
-                        incorrectInfoWindow.open(map, incorrectMarker);
+                        incorrectMarker.openPopup();
                     }, 300);
                 }, 500);
                 
             } else {
                 // Just show the correct location
-                const marker = new google.maps.Marker({
-                    position: correctCoords,
-                    map: map,
-                    title: currentQuestion.place,
-                    animation: google.maps.Animation.DROP
-                });
-                map.markers = [marker];
+                const marker = L.marker([correctCoords.lat, correctCoords.lng], {
+                    title: currentQuestion.place
+                }).addTo(map);
                 
-                // Add info window with location in the "Answer Question" format
-                const infoWindow = new google.maps.InfoWindow({
-                    content: `<div class="p-2">
-                        <strong>${correctLocationKey}${currentQuestion.place}</strong>
-                    </div>`
-                });
+                // Add popup with location
+                marker.bindPopup(`<div class="p-2">
+                    <strong>${correctLocationKey}${currentQuestion.place}</strong>
+                </div>`);
                 
-                // Open info window when clicking on marker
-                marker.addListener('click', () => {
-                    infoWindow.open(map, marker);
-                });
-                
-                // Automatically open info window
+                // Automatically open popup
                 setTimeout(() => {
-                    infoWindow.open(map, marker);
+                    marker.openPopup();
                 }, 500);
             }
             
             // Trigger resize event to ensure map renders correctly
             setTimeout(() => {
-                google.maps.event.trigger(map, 'resize');
+                map.invalidateSize();
             }, 100);
         }
 
@@ -1647,8 +1581,8 @@
                 const questionDiv = document.createElement('div');
                 questionDiv.className = 'p-4 rounded-lg border ' + 
                     (isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 
-                     userAnswer === null ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' : 
-                     'border-red-500 bg-red-50 dark:bg-red-900/20');
+                    userAnswer === null ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' : 
+                    'border-red-500 bg-red-50 dark:bg-red-900/20');
                 
                 // Create grid for question and map
                 const gridDiv = document.createElement('div');
@@ -1656,16 +1590,16 @@
                 
                 // Question info
                 const questionInfo = document.createElement('div');
-                questionInfo.className = 'md:col-span-2';
+                questionInfo.className = 'md:col-span-1';
                 
                 // Question number and content
                 const questionHeader = document.createElement('h3');
                 questionHeader.className = 'text-lg font-bold mb-2';
                 
                 if (currentQuizType === 'location') {
-                    questionHeader.textContent = `題目 ${index + 1}: ${question.place}`;
+                    questionHeader.innerHTML = `題目 ${index + 1}:<br/>${question.place}`;
                 } else {
-                    questionHeader.textContent = `題目 ${index + 1}: ${question.startPoint} → ${question.endPoint}`;
+                    questionHeader.innerHTML = `題目 ${index + 1}:<br/>${question.startPoint} → ${question.endPoint}`;
                 }
                 questionInfo.appendChild(questionHeader);
                 
@@ -1684,6 +1618,9 @@
                 if (userAnswer === null) {
                     userAnswerEl.className = 'text-yellow-600 dark:text-yellow-400';
                     userAnswerEl.innerHTML = '<strong>你的答案:</strong> 未作答';
+                    // Add to wrong question bank
+                    addMistake(question, userAnswer)
+
                 } else if (isCorrect) {
                     userAnswerEl.className = 'text-green-600 dark:text-green-400';
                     userAnswerEl.innerHTML = `<strong>你的答案:</strong> ${userAnswer}`;
@@ -1713,85 +1650,66 @@
                         const userCoords = isIncorrect ? (districtCoordinates[userAnswer] || districtCoordinates["default"]) : null;
                         
                         // Create map
-                        const summaryMap = new google.maps.Map(document.getElementById(`summary-map-${index}`), {
-                            center: correctCoords,
-                            zoom: 14,
-                            mapTypeId: 'roadmap',
-                            mapTypeControl: false,
-                            streetViewControl: false,
-                            fullscreenControl: false
-                        });
+                        const summaryMap = L.map(document.getElementById(`summary-map-${index}`)).setView([correctCoords.lat, correctCoords.lng], 14);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '© OpenStreetMap contributors'
+                        }).addTo(summaryMap);
                         
                         // Add marker for correct location
-                        const correctMarker = new google.maps.Marker({
-                            position: correctCoords,
-                            map: summaryMap,
-                            title: `${question.place}`,
-                            animation: google.maps.Animation.DROP,
-                            icon: isIncorrect ? {
-                                path: google.maps.SymbolPath.CIRCLE,
-                                fillColor: '#4CAF50',
-                                fillOpacity: 1,
-                                strokeWeight: 0,
-                                scale: 8
-                            } : null
+                        const correctMarker = L.marker([correctCoords.lat, correctCoords.lng], {
+                            title: `${question.place}`
                         });
                         
-                        // Info window for correct location
-                        const correctInfoWindow = new google.maps.InfoWindow({
-                            content: `<div class="p-1">
-                                <strong>${correctLocationKey}${question.place}</strong>
-                            </div>`
-                        });
+                        if (isIncorrect) {
+                            correctMarker.setIcon(L.divIcon({
+                                className: 'custom-div-icon',
+                                html: `<div style="background-color:#4CAF50;width:16px;height:16px;border-radius:50%;"></div>`,
+                                iconSize: [16, 16],
+                                iconAnchor: [8, 8]
+                            }));
+                        }
+                        correctMarker.addTo(summaryMap);
                         
-                        correctMarker.addListener('click', () => {
-                            correctInfoWindow.open(summaryMap, correctMarker);
-                        });
+                        // Popup for correct location
+                        correctMarker.bindPopup(`<div class="p-1">
+                            <strong>${correctLocationKey}${question.place}</strong>
+                        </div>`);
                         
                         // If user answer is incorrect, show that marker too
                         if (isIncorrect && userCoords) {
-                            const incorrectMarker = new google.maps.Marker({
-                                position: userCoords,
-                                map: summaryMap,
+                            const incorrectMarker = L.marker([userCoords.lat, userCoords.lng], {
                                 title: `${question.place} (你的選擇)`,
-                                animation: google.maps.Animation.DROP,
-                                icon: {
-                                    path: google.maps.SymbolPath.CIRCLE,
-                                    fillColor: '#F44336',
-                                    fillOpacity: 1,
-                                    strokeWeight: 0,
-                                    scale: 8
-                                }
-                            });
+                                icon: L.divIcon({
+                                    className: 'custom-div-icon',
+                                    html: `<div style="background-color:#F44336;width:16px;height:16px;border-radius:50%;"></div>`,
+                                    iconSize: [16, 16],
+                                    iconAnchor: [8, 8]
+                                })
+                            }).addTo(summaryMap);
                             
-                            // Info window for incorrect answer
-                            const incorrectInfoWindow = new google.maps.InfoWindow({
-                                content: `<div class="p-1">
-                                    <strong>${userAnswer}</strong>
-                                </div>`
-                            });
-                            
-                            incorrectMarker.addListener('click', () => {
-                                incorrectInfoWindow.open(summaryMap, incorrectMarker);
-                            });
+                            // Popup for incorrect answer
+                            incorrectMarker.bindPopup(`<div class="p-1">
+                                <strong>${userAnswer}</strong>
+                            </div>`);
                             
                             // Fit map to show both locations
-                            const bounds = new google.maps.LatLngBounds();
-                            bounds.extend(correctCoords);
-                            bounds.extend(userCoords);
+                            const bounds = L.latLngBounds(
+                                [correctCoords.lat, correctCoords.lng],
+                                [userCoords.lat, userCoords.lng]
+                            );
                             summaryMap.fitBounds(bounds);
                             
-                            // Open both info windows
+                            // Open both popups
                             setTimeout(() => {
-                                correctInfoWindow.open(summaryMap, correctMarker);
+                                correctMarker.openPopup();
                                 setTimeout(() => {
-                                    incorrectInfoWindow.open(summaryMap, incorrectMarker);
+                                    incorrectMarker.openPopup();
                                 }, 200);
                             }, 500);
                         } else {
-                            // Just open the correct location info window
+                            // Just open the correct location popup
                             setTimeout(() => {
-                                correctInfoWindow.open(summaryMap, correctMarker);
+                                correctMarker.openPopup();
                             }, 500);
                         }
                     }, 200 + (index * 100)); // Stagger map creation to prevent too many simultaneous requests
