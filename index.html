@@ -108,19 +108,6 @@
             </div>
         </div>
 
-        <!-- Results Container -->
-        <div id="results-container" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center">
-            <h2 class="text-2xl font-bold mb-4">測驗完成！</h2>
-            <p class="text-lg mb-6">你的最終分數: <span id="final-score">0</span>/<span id="final-total">0</span></p>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <button id="review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">復習錯題</button>
-                <button id="restart-btn" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-opacity-90">重新開始</button>
-            </div>
-            
-            <button id="back-to-selection-btn" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 w-full">返回選擇測驗類型</button>
-        </div>
-
         <!-- Summary Container -->
         <div id="summary-container" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h2 class="text-2xl font-bold mb-4 text-center">測驗總覽</h2>
@@ -1147,12 +1134,6 @@
         const prevButton = document.getElementById('prev-btn');
         const skipButton = document.getElementById('skip-btn');
         const nextButton = document.getElementById('next-btn');
-        
-        const finalScoreElement = document.getElementById('final-score');
-        const finalTotalElement = document.getElementById('final-total');
-        const restartButton = document.getElementById('restart-btn');
-        const reviewButton = document.getElementById('review-btn');
-        const backToSelectionButton = document.getElementById('back-to-selection-btn');
 
         // Event listeners for quiz type selection
         document.getElementById('location-quiz-btn').addEventListener('click', () => {
@@ -1821,19 +1802,6 @@
             });
         }
 
-        // Review incorrect answers
-        function reviewIncorrectAnswers() {
-            if (incorrectQuestions.length > 0) {
-                quizContainer.classList.remove('hidden');
-                summaryContainer.classList.add('hidden');
-                mistakesContainer.classList.add('hidden');
-                
-                // Go to the first incorrect question
-                currentQuestionIndex = incorrectQuestions[0];
-                loadQuestion();
-            }
-        }
-
         // Reset to selection screen
         function backToSelection() {
             quizContainer.classList.add('hidden');
@@ -1849,9 +1817,6 @@
         skipButton.addEventListener('click', skipQuestion);
         nextButton.addEventListener('click', nextQuestion);
         prevButton.addEventListener('click', prevQuestion);
-        restartButton.addEventListener('click', () => startQuiz(currentQuizType));
-        reviewButton.addEventListener('click', reviewIncorrectAnswers);
-        backToSelectionButton.addEventListener('click', backToSelection);
         
         // Initialize by loading saved mistakes
         loadSavedMistakes();
