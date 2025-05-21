@@ -1,0 +1,1366 @@
+<!DOCTYPE html><html lang="zh-HK"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>香港的士考試溫習 | Hong Kong Taxi Exam Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=&amp;callback=Function.prototype"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D5CDE',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .map-container {
+            height: 300px;
+            width: 100%;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-3xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-bold mb-2 text-primary">香港的士考試溫習</h1>
+            <h2 class="text-xl mb-4">Hong Kong Taxi Exam Practice</h2>
+            <p class="text-sm text-gray-600 dark:text-gray-400">基於的士筆試地方及路線試題小冊子</p>
+        </header>
+
+        <!-- Quiz Type Selection Screen -->
+        <div id="quiz-selection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-6 text-center">選擇測驗類型</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <button id="location-quiz-btn" class="p-6 bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-md border-2 border-primary flex flex-col items-center justify-center transition-all">
+                    <span class="text-3xl mb-2">🏢</span>
+                    <h3 class="text-xl font-bold mb-2">地方問題</h3>
+                    <p class="text-sm text-center">測試你對香港地標位置的認識</p>
+                </button>
+                <button id="route-quiz-btn" class="p-6 bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-md border-2 border-primary flex flex-col items-center justify-center transition-all">
+                    <span class="text-3xl mb-2">🛣️</span>
+                    <h3 class="text-xl font-bold mb-2">路線問題</h3>
+                    <p class="text-sm text-center">測試你對香港主要路線的認識</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 hidden">
+            <div id="progress-bar-container" class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-4">
+                <div id="progress-bar" class="bg-primary h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+
+            <div id="stats" class="flex justify-between mb-4 text-sm">
+                <div>Question: <span id="question-number">0</span>/<span id="total-questions">0</span></div>
+                <div>Score: <span id="score">0</span></div>
+            </div>
+
+            <!-- Question Navigation -->
+            <div id="question-nav" class="flex flex-wrap gap-2 mb-4 overflow-x-auto py-2 max-h-32 overflow-y-auto">
+                <!-- Question buttons will be inserted here -->
+            </div>
+
+            <div id="question-container" class="mb-6">
+                <h3 class="text-xl font-bold mb-4" id="question">Loading question...</h3>
+                
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <!-- Options will be inserted here -->
+                </div>
+            </div>
+
+            <div id="feedback" class="hidden mb-4 p-4 rounded-lg"></div>
+            
+            <!-- Map Container -->
+            <div id="map-container" class="hidden mb-4">
+                <div id="map" class="map-container"></div>
+            </div>
+
+            <div class="flex justify-between">
+                <button id="prev-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50">Previous</button>
+                <button id="skip-btn" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">Skip</button>
+                <button id="next-btn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90">Next</button>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div id="results-container" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center">
+            <h2 class="text-2xl font-bold mb-4">測驗完成！</h2>
+            <p class="text-lg mb-6">你的最終分數: <span id="final-score">0</span>/<span id="final-total">0</span></p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <button id="review-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">復習錯題</button>
+                <button id="restart-btn" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-opacity-90">重新開始</button>
+            </div>
+            
+            <button id="back-to-selection-btn" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 w-full">返回選擇測驗類型</button>
+        </div>
+
+        <div class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
+            <p>根據的士筆試乙部試題（地方及路線）設計</p>
+            <p class="mt-2">
+                <a href="https://yellow-adelheid-31.tiiny.site/" target="_blank" class="text-primary hover:underline">按此</a>下載改良版的士則例簡介<br>
+                改良版的士則例簡介取材自運輸處文件，由原先的直向排版改為橫向，更便於閲讀<br>
+                請參閲運輸處網站以獲取最新版本
+            </p>
+            <p class="mt-4">
+                如閣下有任何意見或發現本網站出錯，請<a href="http://forms.gle/9kmEMKaL7KugCnMv7" target="_blank" class="text-primary hover:underline">到此與我們聯絡</a>，謝謝！
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Check and set dark mode based on user preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+
+        // Map variables
+        let map = null;
+        const mapContainer = document.getElementById('map-container');
+        const mapElement = document.getElementById('map');
+
+        // Location quiz data
+        const locationQuizData = [
+            { place: "瑪麗醫院", location: "薄扶林" },
+            { place: "威爾斯親王醫院", location: "沙田" },
+            { place: "贊育醫院", location: "西營盤" },
+            { place: "東華醫院", location: "上環" },
+            { place: "東華三院馮堯敬醫院", location: "薄扶林" },
+            { place: "葛量洪醫院", location: "黃竹坑" },
+            { place: "東區尤德夫人那打素醫院", location: "柴灣" },
+            { place: "東華東院", location: "大坑" },
+            { place: "鄧肇堅醫院", location: "灣仔" },
+            { place: "律敦治醫院", location: "灣仔" },
+            { place: "黃竹坑醫院", location: "黃竹坑徑" },
+            { place: "伊利沙伯醫院", location: "油麻地" },
+            { place: "九龍醫院", location: "九龍城" },
+            { place: "香港佛教醫院", location: "樂富" },
+            { place: "香港眼科醫院", location: "九龍城" },
+            { place: "東華三院黃大仙醫院", location: "沙田坳道" },
+            { place: "聖母醫院", location: "黃大仙" },
+            { place: "廣華醫院", location: "油麻地" },
+            { place: "明愛醫院", location: "長沙灣" },
+            { place: "瑪嘉烈醫院", location: "荔景" },
+            { place: "葵涌醫院", location: "荔景" },
+            { place: "仁濟醫院", location: "荃灣" },
+            { place: "基督教聯合醫院", location: "秀茂坪" },
+            { place: "靈實醫院", location: "將軍澳" },
+            { place: "將軍澳醫院", location: "寶寧里" },
+            { place: "沙田醫院", location: "亞公角街" },
+            { place: "雅麗氏何妙齡那打素醫院", location: "大埔" },
+            { place: "大埔醫院", location: "全安路" },
+            { place: "北區醫院", location: "上水" },
+            { place: "屯門醫院", location: "青松觀路" },
+            { place: "博愛醫院", location: "元朗" },
+            { place: "嘉諾撒醫院", location: "半山" },
+            { place: "明德國際醫院", location: "山頂" },
+            { place: "香港港安醫院", location: "跑馬地" },
+            { place: "聖保祿醫院", location: "東院道" },
+            { place: "養和醫院", location: "跑馬地" },
+            { place: "寶血醫院（明愛）", location: "深水埗" },
+            { place: "播道醫院", location: "九龍城" },
+            { place: "聖德肋撒醫院", location: "九龍城" },
+            { place: "香港浸信會醫院", location: "九龍塘" },
+            { place: "荃灣港安醫院", location: "荃景圍" },
+            { place: "沙田國際醫務中心仁安醫院", location: "富健街" },
+            { place: "青山醫院", location: "屯門" },
+            { place: "小欖醫院", location: "青松觀路" },
+            { place: "大口環根德公爵夫人兒童醫院", location: "薄扶林" },
+            { place: "北大嶼山醫院", location: "松仁路" },
+            { place: "天水圍醫院", location: "天壇街" },
+            { place: "港怡醫院", location: "黃竹坑" },
+            { place: "香港兒童醫院", location: "九龍灣" },
+            { place: "香港中文大學醫院", location: "澤祥街" },
+            { place: "星光大道", location: "尖沙咀" },
+            { place: "金紫荊廣場", location: "灣仔" },
+            { place: "香港迪士尼樂園", location: "竹篙灣" },
+            { place: "香港濕地公園", location: "天水圍" },
+            { place: "玉器市場", location: "油麻地" },
+            { place: "九龍寨城公園", location: "九龍城" },
+            { place: "昂坪纜車 - 東涌纜車站", location: "達東路" },
+            { place: "香港海洋公園", location: "黃竹坑" },
+            { place: "寶蓮禪寺", location: "昂坪" },
+            { place: "凌霄閣", location: "山頂道" },
+            { place: "亞洲國際博覽館", location: "赤鱲角" },
+            { place: "屏山文物徑", location: "元朗" },
+            { place: "香港會議展覽中心", location: "灣仔" },
+            { place: "香港文化博物館", location: "沙田" },
+            { place: "香港歷史博物館", location: "尖沙咀" },
+            { place: "香港科學館", location: "尖沙咀" },
+            { place: "香港太空館", location: "尖沙咀" },
+            { place: "香港大會堂", location: "中環" },
+            { place: "香港體育館", location: "紅磡" },
+            { place: "香港文化中心", location: "尖沙咀" },
+            { place: "伊利沙伯體育館", location: "灣仔" },
+            { place: "沙田大會堂", location: "源禾路" },
+            { place: "尖沙咀天星碼頭", location: "尖沙咀" },
+            { place: "1881", location: "廣東道" },
+            { place: "沙田車公廟", location: "大圍" },
+            { place: "文武廟", location: "上環" },
+            { place: "林村許願廣場", location: "大埔" },
+            { place: "龍躍頭文物徑", location: "粉嶺" },
+            { place: "美利樓", location: "赤柱" },
+            { place: "和昌大押", location: "莊士敦道" },
+            { place: "大館", location: "荷李活道" },
+            { place: "香港藝術館", location: "尖沙咀" },
+            { place: "啟德郵輪碼頭", location: "承豐道" },
+            { place: "香港故宮文化博物館", location: "博物館道" },
+            { place: "戲曲中心", location: "柯士甸道西" },
+            { place: "8度海逸酒店", location: "土瓜灣" },
+            { place: "九龍海逸君綽酒店", location: "紅磡" },
+            { place: "九龍維景酒店", location: "何文田" },
+            { place: "九龍酒店", location: "尖沙咀" },
+            { place: "九龍香格里拉大酒店", location: "尖沙咀" },
+            { place: "六國酒店", location: "灣仔" },
+            { place: "北角海逸酒店", location: "英皇道" },
+            { place: "千禧新世界香港酒店", location: "尖沙咀" },
+            { place: "君怡酒店", location: "尖沙咀" },
+            { place: "嘉湖海逸酒店", location: "天水圍" },
+            { place: "富豪九龍酒店", location: "尖沙咀" },
+            { place: "富豪東方酒店", location: "九龍城" },
+            { place: "富豪香港酒店", location: "銅鑼灣" },
+            { place: "帝京酒店", location: "旺角" },
+            { place: "帝景酒店", location: "汀九" },
+            { place: "帝苑酒店", location: "尖沙咀" },
+            { place: "帝都酒店", location: "沙田" },
+            { place: "柏寧酒店", location: "銅鑼灣" },
+            { place: "港島英迪格酒店", location: "灣仔" },
+            { place: "皇家太平洋酒店", location: "尖沙咀" },
+            { place: "諾富特東薈城酒店", location: "東涌" },
+            { place: "都會海逸酒店", location: "紅磡" },
+            { place: "香港半島酒店", location: "尖沙咀" },
+            { place: "香港君悅酒店", location: "灣仔" },
+            { place: "香港喜來登酒店", location: "尖沙咀" },
+            { place: "香港四季酒店", location: "中環" },
+            { place: "香港天際萬豪酒店", location: "赤鱲角" },
+            { place: "香港康得思酒店", location: "上海街" },
+            { place: "香港文華東方酒店", location: "中環" },
+            { place: "香港朗廷酒店", location: "尖沙咀" },
+            { place: "香港沙田凱悅酒店", location: "澤祥街" },
+            { place: "香港麗晶酒店", location: "尖沙咀" },
+            { place: "香港港麗酒店", location: "金鐘" },
+            { place: "香港灣仔帝盛酒店", location: "皇后大道東" },
+            { place: "香港珀麗酒店", location: "銅鑼灣" },
+            { place: "香港百樂酒店", location: "尖沙咀" },
+            { place: "粵海華美灣際酒店", location: "灣仔" },
+            { place: "香港萬麗海景酒店", location: "灣仔" },
+            { place: "香港諾富特世紀酒店", location: "灣仔" },
+            { place: "香港金域假日酒店", location: "尖沙咀" },
+            { place: "香港銅鑼灣皇冠假日酒店", location: "禮頓道" },
+            { place: "香港黃金海岸酒店", location: "掃管笏" },
+            { place: "馬哥孛羅香港酒店", location: "尖沙咀" },
+            { place: "麗豪酒店", location: "沙田" },
+            { place: "香港維港凱悅尚萃酒店", location: "北角" },
+            { place: "唯港薈", location: "尖沙咀" },
+            { place: "奧華酒店南岸", location: "黃竹坑" },
+            { place: "南灣如心酒店", location: "香港仔" },
+            { place: "荃灣西如心酒店", location: "楊屋道" },
+            { place: "九龍東如心酒店", location: "觀塘" },
+            { place: "銅鑼灣如心酒店", location: "英皇道" },
+            { place: "富豪機場酒店會議中心", location: "赤鱲角" },
+            { place: "尖沙咀皇悅酒店", location: "金巴利道" },
+            { place: "海景嘉福洲際酒店", location: "尖沙咀" },
+            { place: "港威酒店", location: "尖沙咀" },
+            { place: "港島海逸君綽酒店", location: "北角" },
+            { place: "港島皇悅酒店", location: "軒尼詩道" },
+            { place: "港島香格里拉大酒店", location: "法院道" },
+            { place: "美麗華酒店", location: "尖沙咀" },
+            { place: "華美達海景酒店", location: "皇后大道西" },
+            { place: "迪士尼好萊塢酒店", location: "大嶼山" },
+            { place: "迪士尼探索家度假酒店", location: "竹篙灣" },
+            { place: "銅鑼灣皇悅酒店", location: "永興街" },
+            { place: "香港W酒店", location: "柯士甸道西" },
+            { place: "香港JW萬豪酒店", location: "金鐘道" },
+            { place: "香港九龍東皇冠假日酒店", location: "將軍澳" },
+            { place: "香港嘉里酒店", location: "紅磡" },
+            { place: "香港尖沙咀凱悦酒店", location: "河內道" },
+            { place: "香港屯門貝爾特酒店", location: "震寰路" },
+            { place: "香港旺角帝盛酒店", location: "大角咀" },
+            { place: "香港東隅", location: "鰂魚涌" },
+            { place: "香港沙田萬怡酒店", location: "安平街" },
+            { place: "名迪港島酒店", location: "摩頓臺" },
+            { place: "香港瑰麗酒店", location: "尖沙咀" },
+            { place: "香港美利酒店", location: "中環" },
+            { place: "香港萬怡酒店", location: "干諾道西" },
+            { place: "香港觀塘帝盛酒店", location: "鴻圖道" },
+            { place: "香港迪士尼樂園酒店", location: "竹篙灣" },
+            { place: "香港逸東酒店", location: "佐敦" },
+            { place: "香港麗思卡爾頓酒店", location: "柯士甸道西" },
+            { place: "帝逸酒店", location: "沙田" },
+            { place: "WM酒店", location: "西貢" },
+            { place: "歷山酒店", location: "北角" },
+            { place: "香港瑞吉酒店", location: "灣仔" },
+            { place: "香港東涌世茂喜來登酒店", location: "怡東路" },
+            { place: "香港富麗敦海洋公園酒店", location: "香港仔" },
+            { place: "麗豪航天城酒店", location: "赤鱲角" },
+            { place: "北角政府合署", location: "渣華道" },
+            { place: "長沙灣政府合署", location: "長沙灣道" },
+            { place: "何文田政府合署", location: "忠孝街" },
+            { place: "東九龍政府合署", location: "觀塘" },
+            { place: "九龍政府合署", location: "油麻地" },
+            { place: "葵興政府合署", location: "興芳路" },
+            { place: "荔枝角政府合署", location: "荔灣道" },
+            { place: "馬頭角道政府合署", location: "馬頭角道" },
+            { place: "旺角政府合署", location: "聯運街" },
+            { place: "梅窩政府合署", location: "銀鑛灣路" },
+            { place: "牛頭角政府合署", location: "安華街" },
+            { place: "北區政府合署", location: "粉嶺" },
+            { place: "培正道政府合署", location: "何文田" },
+            { place: "西貢政府合署", location: "親民街" },
+            { place: "沙田政府合署", location: "上禾輋路" },
+            { place: "深水埗政府合署", location: "元州街" },
+            { place: "大興政府合署", location: "屯門" },
+            { place: "大埔政府合署", location: "汀角路" },
+            { place: "土瓜灣政府合署", location: "馬頭圍道" },
+            { place: "荃灣政府合署", location: "西樓角路" },
+            { place: "屯門政府合署", location: "屯喜路" },
+            { place: "元朗政府合署", location: "橋樂坊" },
+            { place: "觀塘區警署", location: "鯉魚門道" },
+            { place: "旺角區警署", location: "太子道西" },
+            { place: "將軍澳區警署", location: "寶琳北路" },
+            { place: "荃灣區警署", location: "荃景圍" },
+            { place: "中區警區總部", location: "中港道" },
+            { place: "東區法院大樓", location: "西灣河" },
+            { place: "終審法院", location: "中環" },
+            { place: "立法會綜合大樓", location: "金鐘" },
+            { place: "香港禮賓府", location: "中環" },
+            { place: "香港中央圖書館", location: "銅鑼灣" },
+            { place: "醫院管理局大樓", location: "九龍城" },
+            { place: "九龍城法院大樓", location: "亞皆老街" },
+            { place: "觀塘法院大樓", location: "鯉魚門道" },
+            { place: "粉嶺法院大樓", location: "璧峰路" },
+            { place: "沙田法院大樓", location: "宜正里" },
+            { place: "屯門法院大樓", location: "屯喜路" },
+            { place: "西九龍法院大樓", location: "通州街" },
+            { place: "高等法院", location: "金鐘道" },
+            { place: "勞資審裁處", location: "加士居道" },
+            { place: "土地審裁處", location: "加士居道" },
+            { place: "區域法院", location: "港灣道" },
+            { place: "西九龍政府合署", location: "海庭道" },
+            { place: "入境事務處總部", location: "將軍澳" },
+            { place: "機電工程署總部大樓", location: "啟成街" },
+            { place: "中環中心", location: "皇后大道中" },
+            { place: "如心廣場", location: "荃灣" },
+            { place: "長江集團中心", location: "中環" },
+            { place: "利園", location: "銅鑼灣" },
+            { place: "新鴻基中心", location: "灣仔" },
+            { place: "華懋交易廣場", location: "鰂魚涌" },
+            { place: "力寶中心", location: "金鐘" },
+            { place: "美麗華廣場", location: "尖沙咀" },
+            { place: "太古廣場", location: "金鐘" },
+            { place: "英國保誠保險大樓", location: "尖沙咀" },
+            { place: "中國太平大廈", location: "新寧道" },
+            { place: "電視廣播有限公司電視廣播城", location: "將軍澳" },
+            { place: "港威大廈", location: "尖沙咀" },
+            { place: "貿易廣場", location: "長沙灣" },
+            { place: "海富中心", location: "夏慤道" },
+            { place: "統一中心", location: "金鐘" },
+            { place: "環球大廈", location: "中環" },
+            { place: "國際金融中心", location: "中環" },
+            { place: "環球貿易廣場", location: "柯士甸道西" },
+            { place: "中環廣場", location: "港灣道" },
+            { place: "中銀大廈", location: "花園道" },
+            { place: "港島東中心", location: "鰂魚涌" },
+            { place: "中遠大廈", location: "皇后大道中" },
+            { place: "怡和大廈", location: "中環" },
+            { place: "永安集團大廈", location: "德輔道中" },
+            { place: "香港滙豐總行大廈", location: "中環" },
+            { place: "合和中心", location: "灣仔" },
+            { place: "圓方", location: "柯士甸道西" },
+            { place: "又一城", location: "達之路" },
+            { place: "海港城", location: "尖沙咀" },
+            { place: "置地廣場", location: "中環" },
+            { place: "上水廣場", location: "龍琛路" },
+            { place: "朗豪坊", location: "旺角" },
+            { place: "荷里活廣場", location: "鑽石山" },
+            { place: "時代廣場", location: "銅鑼灣" },
+            { place: "西港城", location: "上環" },
+            { place: "黃埔新天地", location: "紅磡" },
+            { place: "元創方", location: "鴨巴甸街" },
+            { place: "世貿中心", location: "告士打道" },
+            { place: "K11購物藝術館", location: "河內道" },
+            { place: "青衣城", location: "青敬路" },
+            { place: "新城市廣場", location: "沙田" },
+            { place: "奧海城2期", location: "海庭道" },
+            { place: "崇光銅鑼灣店", location: "軒尼詩道" },
+            { place: "屯門市廣場", location: "屯順街" },
+            { place: "中港城", location: "尖沙咀" },
+            { place: "東薈城名店倉", location: "東涌" },
+            { place: "利舞臺", location: "銅鑼灣" },
+            { place: "南豐紗廠", location: "白田壩街" },
+            { place: "K11人文購物藝術館", location: "梳士巴利道" },
+            { place: "裕民坊", location: "觀塘" },
+            { place: "AIRSIDE", location: "啟德" },
+            { place: "圍方", location: "車公廟路" },
+            { place: "APM", location: "觀塘" },
+            { place: "V Walk", location: "深旺道" },
+            { place: "德福花園", location: "偉業街" },
+            { place: "淘大花園", location: "九龍灣" },
+            { place: "匯景花園", location: "藍田" },
+            { place: "綠楊新邨", location: "荃灣" },
+            { place: "盈翠半島", location: "青衣" },
+            { place: "港灣豪庭", location: "福利街" },
+            { place: "新屯門中心", location: "龍門路" },
+            { place: "錦綉花園", location: "元朗" },
+            { place: "嘉湖山莊", location: "天水圍" },
+            { place: "美孚新邨", location: "荔枝角" },
+            { place: "太古城", location: "鰂魚涌" },
+            { place: "沙田第一城", location: "小瀝源路" },
+            { place: "黃埔花園", location: "紅磡" },
+            { place: "海怡半島", location: "鴨脷洲" },
+            { place: "麗港城", location: "觀塘" },
+            { place: "愉景灣", location: "大嶼山" },
+            { place: "新都城", location: "寶林" },
+            { place: "杏花邨", location: "柴灣" },
+            { place: "麗城花園", location: "荃灣" },
+            { place: "映灣園", location: "東涌" },
+            { place: "珀麗灣", location: "馬灣" },
+            { place: "維景灣畔", location: "調景嶺" },
+            { place: "海逸豪園", location: "紅磡" },
+            { place: "置富花園", location: "薄扶林" },
+            { place: "將軍澳中心", location: "唐德街" },
+            { place: "大埔中心", location: "安邦路" },
+            { place: "東堤灣畔", location: "東涌" },
+            { place: "新港城", location: "馬鞍山" },
+            { place: "富榮花園", location: "海庭道" },
+            { place: "海山樓", location: "鰂魚涌" },
+            { place: "嘉匯", location: "沐寧街" },
+            { place: "擎天半島", location: "柯士甸道西" },
+            { place: "形點", location: "朗日路" },
+            { place: "香港恒生大學", location: "小瀝源" },
+            { place: "香港城市大學", location: "九龍塘" },
+            { place: "香港浸會大學", location: "九龍塘" },
+            { place: "香港樹仁大學", location: "北角" },
+            { place: "嶺南大學", location: "屯門" },
+            { place: "香港中文大學", location: "沙田" },
+            { place: "香港教育大學", location: "大埔" },
+            { place: "香港理工大學", location: "紅磡" },
+            { place: "香港科技大學", location: "清水灣" },
+            { place: "香港都會大學", location: "何文田" },
+            { place: "香港大學本部大樓", location: "般咸道" },
+            { place: "聖方濟各大學", location: "翠嶺里" }
+        ];
+
+        // Route quiz data
+        const routeQuizData = [
+            { 
+                startPoint: "沙田富豪花園", 
+                endPoint: "屯門市廣場", 
+                route: "城門隧道公路、城門隧道、象鼻山路、屯門公路、屯喜路、屯隆街及屯順街"
+            },
+            { 
+                startPoint: "深水埗南昌邨", 
+                endPoint: "港鐵上水站", 
+                route: "深旺道、連翔道、青沙公路、尖山隧道、吐露港公路、粉嶺公路及新運路"
+            },
+            { 
+                startPoint: "西貢匡湖居", 
+                endPoint: "大口環根德公爵夫人兒童醫院", 
+                route: "清水灣道、太子道東、亞皆老街、櫻桃街、西區海底隧道、干諾道西、城西道、域多利道及大口環道"
+            },
+            { 
+                startPoint: "旺角麥花臣遊樂場", 
+                endPoint: "海洋公園", 
+                route: "山東街、染布房街、衛理道、康莊道、紅磡海底隧道、香港仔隧道及海洋公園道"
+            },
+            { 
+                startPoint: "香港大學", 
+                endPoint: "太古城中心", 
+                route: "薄扶林道、干諾道西、中環及灣仔繞道隧道、東區走廊、太古灣道及太古城道"
+            },
+            { 
+                startPoint: "紅磡高山劇場", 
+                endPoint: "長沙灣廣場", 
+                route: "信用街、佛光街、培正道、梭椏道、亞皆老街、彌敦道、荔枝角道、大南西街及長沙灣道"
+            },
+            { 
+                startPoint: "荃灣沙咀道遊樂場", 
+                endPoint: "沙田中心", 
+                route: "大河道、象鼻山道、城門隧道、沙田鄉事會路、源禾路及担杆莆街"
+            },
+            { 
+                startPoint: "九龍塘香港浸會大學大學會堂", 
+                endPoint: "灣仔鷹君中心", 
+                route: "窩打老道、公主道、紅磡海底隧道、告士打道及港灣道"
+            },
+            { 
+                startPoint: "九龍公共圖書館", 
+                endPoint: "跑馬地馬場", 
+                route: "培正道、公主道、康莊道、紅磡海底隧道、堅拿道天橋及黃泥涌道"
+            },
+            { 
+                startPoint: "長沙灣政府合署", 
+                endPoint: "觀塘區警署", 
+                route: "長沙灣道、界限街、太子道東、觀塘道及鯉魚門道"
+            },
+            { 
+                startPoint: "西九文化區戲曲中心", 
+                endPoint: "九龍灣德福廣場", 
+                route: "柯士甸道、漆咸道北、東九龍走廊、啟德隧道、啟福道及偉業街"
+            },
+            { 
+                startPoint: "觀塘秀茂坪邨", 
+                endPoint: "香港中央圖書館", 
+                route: "秀茂坪道、將軍澳道、啟田道、東區海底隧道、英皇道及高士威道"
+            },
+            { 
+                startPoint: "海富中心", 
+                endPoint: "葵興政府合署", 
+                route: "德立街、夏慤道、告士打道、紅磡海底隧道、西九龍走廊、葵涌道及興芳路"
+            },
+            { 
+                startPoint: "青衣灝景灣", 
+                endPoint: "沙田車公廟", 
+                route: "青衣鄉事會路、青衣南橋、呈祥道、青沙公路、尖山隧道、車公廟路及翠田街"
+            },
+            { 
+                startPoint: "鴨脷洲利東邨", 
+                endPoint: "佐敦拔萃女書院", 
+                route: "鴨脷洲大橋、香港仔隧道、紅磡海底隧道、加士居道及佐敦道"
+            },
+            { 
+                startPoint: "上水廣場", 
+                endPoint: "入境事務處總部", 
+                route: "粉嶺公路、吐露港公路﹑大老山公路﹑大老山隧道﹑觀塘繞道﹑將軍澳道﹑環保大道及寶邑路"
+            },
+            { 
+                startPoint: "九龍塘商業電台", 
+                endPoint: "電視廣播城", 
+                route: "廣播道、竹園道、龍翔道、觀塘道、將軍澳道、環保大道及駿日街"
+            },
+            { 
+                startPoint: "九龍塘又一城", 
+                endPoint: "沙田大會堂", 
+                route: "達之路、歌和老街、窩打老道、獅子山隧道、大涌橋路、沙田鄉事會路、源禾路及担杆莆街"
+            },
+            { 
+                startPoint: "香港大球場", 
+                endPoint: "荔枝角公共圖書館", 
+                route: "加路連山道、連道、黃泥涌道、堅拿道天橋、紅磡海底隧道、加士居道天橋、西九龍走廊、荔枝角道、美荔道及荔灣道"
+            },
+            { 
+                startPoint: "元朗形點 I", 
+                endPoint: "港鐵大學站的士站", 
+                route: "錦田公路、林錦公路、吐露港公路及澤祥街"
+            },
+            { 
+                startPoint: "荃灣環宇海灣", 
+                endPoint: "米埔自然保護區", 
+                route: "荃灣路、屯門公路、大欖隧道、青朗公路、新田公路、青山公路米埔段及担竿洲路"
+            },
+            { 
+                startPoint: "薄扶林數碼港", 
+                endPoint: "灣仔胡忠大廈", 
+                route: "數碼港道、沙灣徑、域多利道、沙宣道、薄扶林道、般咸道、堅道、上亞厘畢道、花園道、金鐘道及皇后大道東"
+            },
+            { 
+                startPoint: "薄扶林華富邨", 
+                endPoint: "大潭香港木球會", 
+                route: "華富道、石排灣道、香港仔海傍道、南風道、深水灣道及黃泥涌峽道"
+            },
+            { 
+                startPoint: "元朗大會堂", 
+                endPoint: "馬鞍山新港城中心", 
+                route: "青山公路、錦田公路、林錦公路、吐露港公路、大老山公路、馬鞍山路及西沙路"
+            },
+            { 
+                startPoint: "大埔科學園", 
+                endPoint: "鑽石山星河明居", 
+                route: "科學園路、大老山公路、大老山隧道、鳳德道及龍蟠街"
+            },
+            { 
+                startPoint: "香港文華東方酒店", 
+                endPoint: "赤柱美利樓", 
+                route: "遮打道、金鐘道、皇后大道東、司徒拔道、黃泥涌峽道、淺水灣道、赤柱峽道及赤柱村道"
+            },
+            { 
+                startPoint: "何文田土木工程拓展署大樓", 
+                endPoint: "九龍灣機電工程署總部大樓", 
+                route: "忠孝街、佛光街、馬頭圍道、土瓜灣道、承啟道及啟成街"
+            },
+            { 
+                startPoint: "紅磡置富都會", 
+                endPoint: "北角廉政公署總部大樓", 
+                route: "暢運道、科學館道、康莊道、紅磡海底隧道、東區走廊及渣華道"
+            },
+            { 
+                startPoint: "香港體育學院", 
+                endPoint: "荃灣城門谷運動場", 
+                route: "源禾路、大埔公路沙田段、城門隧道、象山邨西路及城門道"
+            },
+            { 
+                startPoint: "葵芳葵青劇院", 
+                endPoint: "中環碼頭", 
+                route: "荃灣路、青葵公路、西九龍公路、西區海底隧道、干諾道西及民光街"
+            },
+            { 
+                startPoint: "基督教聯合醫院", 
+                endPoint: "旺角區警署", 
+                route: "協和街、順利邨道、新清水灣道、太子道東及太子道西"
+            },
+            { 
+                startPoint: "佐敦(西九龍站)巴士總站", 
+                endPoint: "銅鑼灣皇悅酒店", 
+                route: "佐敦道、加士居道天橋、康莊道、紅磡海底隧道、維園道及永興街"
+            },
+            { 
+                startPoint: "銅鑼灣禮頓山", 
+                endPoint: "九龍城喇沙書院", 
+                route: "黃泥涌道、堅拿道天橋、紅磡海底隧道、公主道、窩打老道、對衡道及喇沙利道"
+            },
+            { 
+                startPoint: "將軍澳公共圖書館", 
+                endPoint: "香港體育館", 
+                route: "寶康路、將軍澳隧道、觀塘繞道、啟德隧道、東九龍走廊、漆咸道北及暢運道"
+            },
+            { 
+                startPoint: "啟德工業貿易大樓", 
+                endPoint: "高等法院", 
+                route: "協調道、太子道東、漆咸道北、紅磡海底隧道、告士打道、分域街、軒尼詩道及金鐘道"
+            },
+            { 
+                startPoint: "荃灣荃豐中心", 
+                endPoint: "新蒲崗香港考試及評核局", 
+                route: "青山公路荃灣段、青山公路葵涌段、呈祥道、龍翔道、蒲崗村道、彩虹道及爵祿街"
+            },
+            { 
+                startPoint: "稅務中心", 
+                endPoint: "牛頭角下邨", 
+                route: "經協調道﹑承啟道﹑宏照道﹑啟祥道及牛頭角道"
+            }
+        ];
+
+        // Get all unique locations for options
+        const allLocations = [...new Set(locationQuizData.map(item => item.location))];
+        const allRoutes = routeQuizData.map(item => item.route);
+
+        // District coordinates
+        const districtCoordinates = {
+            // Hong Kong Island
+            "中環": { lat: 22.2800, lng: 114.1588 },
+            "金鐘": { lat: 22.2783, lng: 114.1647 },
+            "灣仔": { lat: 22.2783, lng: 114.1747 },
+            "銅鑼灣": { lat: 22.2825, lng: 114.1845 },
+            "北角": { lat: 22.2913, lng: 114.1997 },
+            "太古": { lat: 22.2866, lng: 114.2167 },
+            "鰂魚涌": { lat: 22.2849, lng: 114.2109 },
+            "西灣河": { lat: 22.2832, lng: 114.2225 },
+            "筲箕灣": { lat: 22.2783, lng: 114.2289 },
+            "柴灣": { lat: 22.2673, lng: 114.2395 },
+            "上環": { lat: 22.2861, lng: 114.1504 },
+            "西營盤": { lat: 22.2871, lng: 114.1431 },
+            "薄扶林": { lat: 22.2699, lng: 114.1290 },
+            "香港仔": { lat: 22.2483, lng: 114.1580 },
+            "黃竹坑": { lat: 22.2483, lng: 114.1726 },
+            "鴨脷洲": { lat: 22.2430, lng: 114.1553 },
+            "赤柱": { lat: 22.2170, lng: 114.2131 },
+            "大坑": { lat: 22.2775, lng: 114.1920 },
+            "跑馬地": { lat: 22.2750, lng: 114.1880 },
+            "山頂": { lat: 22.2750, lng: 114.1455 },
+            "半山": { lat: 22.2789, lng: 114.1500 },
+            "摩頓臺": { lat: 22.2789, lng: 114.1844 },
+            "東院道": { lat: 22.2650, lng: 114.1850 },
+            "莊士敦道": { lat: 22.2777, lng: 114.1704 },
+            "干諾道西": { lat: 22.2872, lng: 114.1486 },
+            "花園道": { lat: 22.2778, lng: 114.1583 },
+            "般咸道": { lat: 22.2816, lng: 114.1400 },
+            "德輔道中": { lat: 22.2846, lng: 114.1553 },
+            "皇后大道中": { lat: 22.2817, lng: 114.1570 },
+            "金鐘道": { lat: 22.2780, lng: 114.1665 },
+            "皇后大道東": { lat: 22.2775, lng: 114.1723 },
+            "軒尼詩道": { lat: 22.2780, lng: 114.1698 },
+            "告士打道": { lat: 22.2792, lng: 114.1688 },
+            "港灣道": { lat: 22.2797, lng: 114.1701 },
+            "英皇道": { lat: 22.2883, lng: 114.2019 },
+            "法院道": { lat: 22.2769, lng: 114.1619 },
+            "黃泥涌峽道": { lat: 22.2577, lng: 114.1873 },
+            
+            // Kowloon
+            "尖沙咀": { lat: 22.2983, lng: 114.1747 },
+            "油麻地": { lat: 22.3122, lng: 114.1720 },
+            "佐敦": { lat: 22.3050, lng: 114.1725 },
+            "旺角": { lat: 22.3186, lng: 114.1690 },
+            "大角咀": { lat: 22.3200, lng: 114.1614 },
+            "深水埗": { lat: 22.3308, lng: 114.1622 },
+            "長沙灣": { lat: 22.3341, lng: 114.1565 },
+            "荔枝角": { lat: 22.3348, lng: 114.1433 },
+            "紅磡": { lat: 22.3055, lng: 114.1868 },
+            "九龍城": { lat: 22.3283, lng: 114.1914 },
+            "馬頭圍": { lat: 22.3196, lng: 114.1851 },
+            "土瓜灣": { lat: 22.3178, lng: 114.1902 },
+            "九龍灣": { lat: 22.3222, lng: 114.2130 },
+            "觀塘": { lat: 22.3112, lng: 114.2242 },
+            "牛頭角": { lat: 22.3166, lng: 114.2153 },
+            "藍田": { lat: 22.3061, lng: 114.2336 },
+            "秀茂坪": { lat: 22.3271, lng: 114.2310 },
+            "鑽石山": { lat: 22.3403, lng: 114.2014 },
+            "黃大仙": { lat: 22.3422, lng: 114.1923 },
+            "樂富": { lat: 22.3380, lng: 114.1870 },
+            "何文田": { lat: 22.3185, lng: 114.1763 },
+            "九龍塘": { lat: 22.3371, lng: 114.1772 },
+            "太子": { lat: 22.3214, lng: 114.1694 },
+            "上海街": { lat: 22.3156, lng: 114.1703 },
+            "柯士甸道西": { lat: 22.3037, lng: 114.1658 },
+            "河內道": { lat: 22.2970, lng: 114.1688 },
+            "金巴利道": { lat: 22.2986, lng: 114.1736 },
+            "深旺道": { lat: 22.3248, lng: 114.1616 },
+            "博物館道": { lat: 22.2915, lng: 114.1728 },
+            "太子道西": { lat: 22.3254, lng: 114.1657 },
+            "沙田坳道": { lat: 22.3431, lng: 114.1921 },
+            "忠孝街": { lat: 22.3164, lng: 114.1780 },
+            "啟成街": { lat: 22.3222, lng: 114.2165 },
+            "鴻圖道": { lat: 22.3094, lng: 114.2223 },
+            "新寧道": { lat: 22.3135, lng: 114.1726 },
+            "偉業街": { lat: 22.3233, lng: 114.2178 },
+            "鯉魚門道": { lat: 22.3153, lng: 114.2280 },
+            "啟祥道": { lat: 22.3242, lng: 114.2207 },
+            "宏照道": { lat: 22.3265, lng: 114.2141 },
+            "牛頭角道": { lat: 22.3319, lng: 114.2173 },
+            "協調道": { lat: 22.3281, lng: 114.2089 },
+            "承啟道": { lat: 22.3204, lng: 114.2080 },
+            "暢運道": { lat: 22.3049, lng: 114.1822 },
+            "海庭道": { lat: 22.3176, lng: 114.1543 },
+            "通州街": { lat: 22.3171, lng: 114.1650 },
+            "馬頭角道": { lat: 22.3216, lng: 114.1884 },
+            "安華街": { lat: 22.3252, lng: 114.2190 },
+            "聯運街": { lat: 22.3236, lng: 114.1712 },
+            "亞皆老街": { lat: 22.3266, lng: 114.1794 },
+            
+            // New Territories
+            "荃灣": { lat: 22.3736, lng: 114.1175 },
+            "葵涌": { lat: 22.3627, lng: 114.1274 },
+            "葵芳": { lat: 22.3573, lng: 114.1265 },
+            "青衣": { lat: 22.3545, lng: 114.1093 },
+            "深井": { lat: 22.3654, lng: 114.0574 },
+            "荃景圍": { lat: 22.3727, lng: 114.1158 },
+            "青松觀路": { lat: 22.3928, lng: 113.9775 },
+            "馬灣": { lat: 22.3520, lng: 114.0590 },
+            "屯門": { lat: 22.3911, lng: 113.9692 },
+            "元朗": { lat: 22.4431, lng: 114.0228 },
+            "天水圍": { lat: 22.4630, lng: 114.0001 },
+            "沙田": { lat: 22.3833, lng: 114.1965 },
+            "大圍": { lat: 22.3728, lng: 114.1781 },
+            "馬鞍山": { lat: 22.4246, lng: 114.2292 },
+            "大埔": { lat: 22.4518, lng: 114.1640 },
+            "粉嶺": { lat: 22.4941, lng: 114.1415 },
+            "上水": { lat: 22.5037, lng: 114.1270 },
+            "將軍澳": { lat: 22.3156, lng: 114.2539 },
+            "調景嶺": { lat: 22.3047, lng: 114.2515 },
+            "西貢": { lat: 22.3798, lng: 114.2712 },
+            "大嶼山": { lat: 22.2578, lng: 113.9531 },
+            "東涌": { lat: 22.2859, lng: 113.9415 },
+            "赤鱲角": { lat: 22.3089, lng: 113.9213 },
+            "竹篙灣": { lat: 22.3289, lng: 114.0445 },
+            "昂坪": { lat: 22.2547, lng: 113.9022 },
+            "澤祥街": { lat: 22.4131, lng: 114.2093 },
+            "楊屋道": { lat: 22.3692, lng: 114.1133 },
+            "震寰路": { lat: 22.3911, lng: 113.9760 },
+            "車公廟路": { lat: 22.3689, lng: 114.1865 },
+            "龍琛路": { lat: 22.5023, lng: 114.1289 },
+            "汀角路": { lat: 22.4516, lng: 114.1706 },
+            "朗日路": { lat: 22.4484, lng: 114.0243 },
+            "天壇街": { lat: 22.4538, lng: 114.0001 },
+            "松仁路": { lat: 22.2807, lng: 113.9413 },
+            "達東路": { lat: 22.2803, lng: 113.9425 },
+            "怡東路": { lat: 22.2865, lng: 113.9402 },
+            "富健街": { lat: 22.3828, lng: 114.1926 },
+            "小瀝源路": { lat: 22.3889, lng: 114.2103 },
+            "上禾輋路": { lat: 22.3810, lng: 114.1875 },
+            "安平街": { lat: 22.3810, lng: 114.1895 },
+            "源禾路": { lat: 22.3817, lng: 114.1854 },
+            "亞公角街": { lat: 22.3841, lng: 114.1972 },
+            "宜正里": { lat: 22.3827, lng: 114.1908 },
+            "翠嶺里": { lat: 22.4079, lng: 114.2227 },
+            "寶林": { lat: 22.3139, lng: 114.2558 },
+            "寶寧里": { lat: 22.3173, lng: 114.2670 },
+            "寶琳北路": { lat: 22.3174, lng: 114.2601 },
+            "唐德街": { lat: 22.3072, lng: 114.2597 },
+            "屯喜路": { lat: 22.3944, lng: 113.9739 },
+            "屯順街": { lat: 22.3937, lng: 113.9771 },
+            "龍門路": { lat: 22.3872, lng: 113.9705 },
+            "青敬路": { lat: 22.3598, lng: 114.1086 },
+            "西沙路": { lat: 22.4283, lng: 114.2314 },
+            "青葵公路": { lat: 22.3605, lng: 114.1379 },
+            "葵涌道": { lat: 22.3675, lng: 114.1307 },
+            "興芳路": { lat: 22.3631, lng: 114.1315 },
+            "荔灣道": { lat: 22.3396, lng: 114.1463 },
+            "西樓角路": { lat: 22.3701, lng: 114.1177 },
+            "元州街": { lat: 22.3387, lng: 114.1582 },
+            "橋樂坊": { lat: 22.4433, lng: 114.0343 },
+            "安邦路": { lat: 22.4466, lng: 114.1636 },
+            "璧峰路": { lat: 22.4912, lng: 114.1429 },
+            "環保大道": { lat: 22.3090, lng: 114.2607 },
+            "寶邑路": { lat: 22.3191, lng: 114.2674 },
+            "全安路": { lat: 22.4509, lng: 114.1711 },
+            "銀鑛灣路": { lat: 22.2684, lng: 113.9935 },
+            "承豐道": { lat: 22.3044, lng: 114.2164 },
+            "親民街": { lat: 22.3817, lng: 114.2739 },
+            
+            // Default to Central Hong Kong
+            "default": { lat: 22.302711, lng: 114.177216 }
+        };
+
+        // Quiz variables
+        let currentQuizType = null; // 'location' or 'route'
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = [];
+        const questionsPerQuiz = 20; // Change this to adjust quiz length
+        let quizQuestions = [];
+        let incorrectQuestions = [];
+
+        // DOM elements
+        const quizSelection = document.getElementById('quiz-selection');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results-container');
+        
+        const questionContainer = document.getElementById('question-container');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackElement = document.getElementById('feedback');
+        const progressBar = document.getElementById('progress-bar');
+        const questionNumberElement = document.getElementById('question-number');
+        const totalQuestionsElement = document.getElementById('total-questions');
+        const scoreElement = document.getElementById('score');
+        const questionNav = document.getElementById('question-nav');
+        
+        const prevButton = document.getElementById('prev-btn');
+        const skipButton = document.getElementById('skip-btn');
+        const nextButton = document.getElementById('next-btn');
+        
+        const finalScoreElement = document.getElementById('final-score');
+        const finalTotalElement = document.getElementById('final-total');
+        const restartButton = document.getElementById('restart-btn');
+        const reviewButton = document.getElementById('review-btn');
+        const backToSelectionButton = document.getElementById('back-to-selection-btn');
+
+        // Event listeners for quiz type selection
+        document.getElementById('location-quiz-btn').addEventListener('click', () => {
+            startQuiz('location');
+        });
+
+        document.getElementById('route-quiz-btn').addEventListener('click', () => {
+            startQuiz('route');
+        });
+
+        // Function to shuffle array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Start quiz
+        function startQuiz(quizType) {
+            currentQuizType = quizType;
+            
+            // Hide selection, show quiz
+            quizSelection.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            resultsContainer.classList.add('hidden');
+            
+            // Select and shuffle questions based on quiz type
+            if (quizType === 'location') {
+                quizQuestions = shuffleArray(locationQuizData).slice(0, questionsPerQuiz);
+            } else {
+                quizQuestions = shuffleArray(routeQuizData).slice(0, questionsPerQuiz);
+            }
+            
+            // Initialize quiz state
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = new Array(quizQuestions.length).fill(null);
+            incorrectQuestions = [];
+            
+            // Update UI
+            totalQuestionsElement.textContent = questionsPerQuiz;
+            questionNumberElement.textContent = 1;
+            scoreElement.textContent = 0;
+            
+            // Create question navigation
+            createQuestionNav();
+            
+            // Load first question
+            loadQuestion();
+        }
+
+        // Create question navigation
+        function createQuestionNav() {
+            questionNav.innerHTML = '';
+            
+            for (let i = 0; i < quizQuestions.length; i++) {
+                const btn = document.createElement('button');
+                btn.textContent = i + 1;
+                btn.className = 'w-8 h-8 rounded-full text-sm flex items-center justify-center transition-colors';
+                updateQuestionNavButton(btn, i);
+                
+                btn.addEventListener('click', () => {
+                    currentQuestionIndex = i;
+                    loadQuestion();
+                    updateQuestionNav();
+                });
+                
+                questionNav.appendChild(btn);
+            }
+        }
+
+        // Update question navigation buttons
+        function updateQuestionNav() {
+            const buttons = questionNav.querySelectorAll('button');
+            buttons.forEach((btn, index) => {
+                updateQuestionNavButton(btn, index);
+            });
+        }
+
+        // Update individual question nav button
+        function updateQuestionNavButton(btn, index) {
+            // Clear existing classes
+            btn.className = 'w-8 h-8 rounded-full text-sm flex items-center justify-center transition-colors';
+            
+            // Current question
+            if (index === currentQuestionIndex) {
+                btn.classList.add('bg-primary', 'text-white', 'font-bold');
+            } 
+            // Answered correctly
+            else if (userAnswers[index] !== null) {
+                if (isAnswerCorrect(index)) {
+                    btn.classList.add('bg-green-100', 'dark:bg-green-900', 'text-green-800', 'dark:text-green-200', 'border', 'border-green-500');
+                } else {
+                    btn.classList.add('bg-red-100', 'dark:bg-red-900', 'text-red-800', 'dark:text-red-200', 'border', 'border-red-500');
+                }
+            }
+            // Unanswered
+            else {
+                btn.classList.add('bg-gray-200', 'dark:bg-gray-700', 'hover:bg-gray-300', 'dark:hover:bg-gray-600');
+            }
+        }
+
+        // Check if an answer is correct
+        function isAnswerCorrect(index) {
+            const question = quizQuestions[index];
+            const userAnswer = userAnswers[index];
+            
+            if (currentQuizType === 'location') {
+                return userAnswer === question.location;
+            } else {
+                return userAnswer === question.route;
+            }
+        }
+
+        // Load question
+        function loadQuestion() {
+            const currentQuestion = quizQuestions[currentQuestionIndex];
+            const questionElement = document.getElementById('question');
+            
+            // Hide map container when loading a new question
+            mapContainer.classList.add('hidden');
+            
+            // Set question text based on quiz type
+            if (currentQuizType === 'location') {
+                questionElement.textContent = currentQuestion.place;
+                loadLocationOptions(currentQuestion);
+            } else {
+                questionElement.innerHTML = `${currentQuestion.startPoint} <span class="text-primary">→</span> ${currentQuestion.endPoint}`;
+                loadRouteOptions(currentQuestion);
+            }
+            
+            // Update progress bar
+            progressBar.style.width = `${((currentQuestionIndex + 1) / questionsPerQuiz) * 100}%`;
+            
+            // Update question number
+            questionNumberElement.textContent = currentQuestionIndex + 1;
+            
+            // Handle buttons state
+            prevButton.disabled = currentQuestionIndex === 0;
+            nextButton.disabled = currentQuestionIndex === quizQuestions.length - 1 && userAnswers[currentQuestionIndex] !== null;
+            
+            // Hide feedback
+            feedbackElement.classList.add('hidden');
+            
+            // Update question nav
+            updateQuestionNav();
+        }
+
+        // Load options for location quiz
+        function loadLocationOptions(question) {
+            // Get incorrect options (3 random locations different from the correct one)
+            const incorrectOptions = allLocations
+                .filter(location => location !== question.location)
+                .sort(() => 0.5 - Math.random())
+                .slice(0, 3);
+            
+            // Combine correct and incorrect options and shuffle
+            const options = shuffleArray([question.location, ...incorrectOptions]);
+            
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+            
+            // Create option buttons
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'w-full py-3 px-4 border rounded-lg text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors';
+                
+                // If this question has been answered, show the result
+                if (userAnswers[currentQuestionIndex] !== null) {
+                    if (option === question.location) {
+                        button.classList.add('bg-green-100', 'dark:bg-green-900', 'border-green-500');
+                    } else if (option === userAnswers[currentQuestionIndex]) {
+                        button.classList.add('bg-red-100', 'dark:bg-red-900', 'border-red-500');
+                    }
+                    button.disabled = true;
+                } else {
+                    // Add click event for new answer
+                    button.addEventListener('click', () => selectAnswer(option));
+                }
+                
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // Load options for route quiz
+        function loadRouteOptions(question) {
+            // Get incorrect options (3 random routes different from the correct one)
+            const incorrectOptions = allRoutes
+                .filter(route => route !== question.route)
+                .sort(() => 0.5 - Math.random())
+                .slice(0, 3);
+            
+            // Combine correct and incorrect options and shuffle
+            const options = shuffleArray([question.route, ...incorrectOptions]);
+            
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+            
+            // Create option buttons
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'w-full py-3 px-4 border rounded-lg text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-sm';
+                
+                // If this question has been answered, show the result
+                if (userAnswers[currentQuestionIndex] !== null) {
+                    if (option === question.route) {
+                        button.classList.add('bg-green-100', 'dark:bg-green-900', 'border-green-500');
+                    } else if (option === userAnswers[currentQuestionIndex]) {
+                        button.classList.add('bg-red-100', 'dark:bg-red-900', 'border-red-500');
+                    }
+                    button.disabled = true;
+                } else {
+                    // Add click event for new answer
+                    button.addEventListener('click', () => selectAnswer(option));
+                }
+                
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // Select answer
+        function selectAnswer(selectedOption) {
+            const currentQuestion = quizQuestions[currentQuestionIndex];
+            let isCorrect = false;
+            
+            // Check if answer is correct based on quiz type
+            if (currentQuizType === 'location') {
+                isCorrect = selectedOption === currentQuestion.location;
+            } else {
+                isCorrect = selectedOption === currentQuestion.route;
+            }
+            
+            // Save answer
+            userAnswers[currentQuestionIndex] = selectedOption;
+            
+            // Update score
+            if (isCorrect) {
+                score++;
+                scoreElement.textContent = score;
+            } else {
+                // Track incorrect questions for review
+                incorrectQuestions.push(currentQuestionIndex);
+            }
+            
+            // Show feedback
+            if (currentQuizType === 'location') {
+                feedbackElement.textContent = isCorrect 
+                    ? `✓ 正確！${currentQuestion.place}位於${currentQuestion.location}。` 
+                    : `✗ 不正確。${currentQuestion.place}位於${currentQuestion.location}，不是${selectedOption}。`;
+                
+                // Show map for location quiz
+                showLocationMap(currentQuestion);
+            } else {
+                feedbackElement.textContent = isCorrect 
+                    ? `✓ 正確！從${currentQuestion.startPoint}到${currentQuestion.endPoint}的最直接路線是：${currentQuestion.route}。` 
+                    : `✗ 不正確。從${currentQuestion.startPoint}到${currentQuestion.endPoint}的最直接路線是：${currentQuestion.route}。`;
+            }
+            
+            feedbackElement.className = `mb-4 p-4 rounded-lg ${isCorrect ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'}`;
+            feedbackElement.classList.remove('hidden');
+            
+            // Update options to show correct/incorrect
+            const options = optionsContainer.querySelectorAll('button');
+            options.forEach(button => {
+                button.disabled = true;
+                
+                if (currentQuizType === 'location') {
+                    if (button.textContent === currentQuestion.location) {
+                        button.classList.add('bg-green-100', 'dark:bg-green-900', 'border-green-500');
+                    } else if (button.textContent === selectedOption && !isCorrect) {
+                        button.classList.add('bg-red-100', 'dark:bg-red-900', 'border-red-500');
+                    }
+                } else {
+                    if (button.textContent === currentQuestion.route) {
+                        button.classList.add('bg-green-100', 'dark:bg-green-900', 'border-green-500');
+                    } else if (button.textContent === selectedOption && !isCorrect) {
+                        button.classList.add('bg-red-100', 'dark:bg-red-900', 'border-red-500');
+                    }
+                }
+            });
+            
+            // Update question nav
+            updateQuestionNav();
+            
+            // Enable next button if we're not on the last question
+            if (currentQuestionIndex < quizQuestions.length - 1) {
+                nextButton.disabled = false;
+            } else if (allQuestionsAnswered()) {
+                // If all questions are answered, show a "Finish" button
+                nextButton.textContent = "完成測驗";
+                nextButton.disabled = false;
+            }
+        }
+
+        // Show location on map using district coordinates
+        function showLocationMap(currentQuestion) {
+            // Only show map for location quiz
+            if (currentQuizType !== 'location') return;
+            
+            mapContainer.classList.remove('hidden');
+            
+            // Get the specific district or street coordinates for the correct answer
+            const correctLocationKey = currentQuestion.location;
+            const correctCoords = districtCoordinates[correctLocationKey] || districtCoordinates["default"];
+            
+            // Get the user's answer if there is one and it's incorrect
+            const userAnswer = userAnswers[currentQuestionIndex];
+            const isIncorrect = userAnswer !== null && userAnswer !== correctLocationKey;
+            const userCoords = isIncorrect ? (districtCoordinates[userAnswer] || districtCoordinates["default"]) : null;
+            
+            // If map doesn't exist, create it
+            if (!map) {
+                map = new google.maps.Map(mapElement, {
+                    center: correctCoords,
+                    zoom: 15,
+                    mapTypeId: 'roadmap',
+                    mapTypeControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: false
+                });
+            } else {
+                // Otherwise just update the center
+                map.setCenter(correctCoords);
+                map.setZoom(15);
+            }
+            
+            // Clear any existing markers
+            if (map.markers) {
+                map.markers.forEach(marker => marker.setMap(null));
+            }
+            map.markers = [];
+            
+            // If we're showing both locations (incorrect answer scenario)
+            if (isIncorrect && userCoords) {
+                // Add marker for correct location (green)
+                const correctMarker = new google.maps.Marker({
+                    position: correctCoords,
+                    map: map,
+                    title: `${currentQuestion.place} (正確位置)`,
+                    animation: google.maps.Animation.DROP,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: '#4CAF50',
+                        fillOpacity: 1,
+                        strokeWeight: 0,
+                        scale: 10
+                    }
+                });
+                
+                // Add marker for incorrect location (red)
+                const incorrectMarker = new google.maps.Marker({
+                    position: userCoords,
+                    map: map,
+                    title: `${currentQuestion.place} (你的選擇)`,
+                    animation: google.maps.Animation.DROP,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        fillColor: '#F44336',
+                        fillOpacity: 1,
+                        strokeWeight: 0,
+                        scale: 10
+                    }
+                });
+                
+                map.markers = [correctMarker, incorrectMarker];
+                
+                // Fit map to show both markers
+                const bounds = new google.maps.LatLngBounds();
+                bounds.extend(correctCoords);
+                bounds.extend(userCoords);
+                map.fitBounds(bounds);
+                
+                // Add info windows
+                const correctInfoWindow = new google.maps.InfoWindow({
+                    content: `<div class="p-2">
+                        <strong>${correctLocationKey}${currentQuestion.place}</strong><br>
+                        <span class="text-green-600">✓ 正確位置</span>
+                    </div>`
+                });
+                
+                const incorrectInfoWindow = new google.maps.InfoWindow({
+                    content: `<div class="p-2">
+                        <strong>${userAnswer}</strong><br>
+                        <span class="text-red-600">✗ 你的選擇</span>
+                    </div>`
+                });
+                
+                // Add click listeners
+                correctMarker.addListener('click', () => {
+                    correctInfoWindow.open(map, correctMarker);
+                });
+                
+                incorrectMarker.addListener('click', () => {
+                    incorrectInfoWindow.open(map, incorrectMarker);
+                });
+                
+                // Open both info windows
+                setTimeout(() => {
+                    correctInfoWindow.open(map, correctMarker);
+                    // Slight delay for second window to avoid overlap/flickering
+                    setTimeout(() => {
+                        incorrectInfoWindow.open(map, incorrectMarker);
+                    }, 300);
+                }, 500);
+                
+            } else {
+                // Just show the correct location
+                const marker = new google.maps.Marker({
+                    position: correctCoords,
+                    map: map,
+                    title: currentQuestion.place,
+                    animation: google.maps.Animation.DROP
+                });
+                map.markers = [marker];
+                
+                // Add info window with location in the "Answer Question" format
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `<div class="p-2">
+                        <strong>${correctLocationKey}${currentQuestion.place}</strong>
+                    </div>`
+                });
+                
+                // Open info window when clicking on marker
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+                
+                // Automatically open info window
+                setTimeout(() => {
+                    infoWindow.open(map, marker);
+                }, 500);
+            }
+            
+            // Trigger resize event to ensure map renders correctly
+            setTimeout(() => {
+                google.maps.event.trigger(map, 'resize');
+            }, 100);
+        }
+
+        // Skip question
+        function skipQuestion() {
+            if (currentQuestionIndex < quizQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            }
+        }
+
+        // Go to next question
+        function nextQuestion() {
+            if (currentQuestionIndex < quizQuestions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else if (allQuestionsAnswered()) {
+                endQuiz();
+            }
+        }
+
+        // Go to previous question
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
+            }
+        }
+
+        // Check if all questions are answered
+        function allQuestionsAnswered() {
+            return userAnswers.every(answer => answer !== null);
+        }
+
+        // End quiz
+        function endQuiz() {
+            quizContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+            finalScoreElement.textContent = score;
+            finalTotalElement.textContent = questionsPerQuiz;
+            
+            // Disable review button if all answers are correct
+            reviewButton.disabled = incorrectQuestions.length === 0;
+            if (incorrectQuestions.length === 0) {
+                reviewButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Review incorrect answers
+        function reviewIncorrectAnswers() {
+            if (incorrectQuestions.length > 0) {
+                resultsContainer.classList.add('hidden');
+                quizContainer.classList.remove('hidden');
+                
+                // Go to the first incorrect question
+                currentQuestionIndex = incorrectQuestions[0];
+                loadQuestion();
+            }
+        }
+
+        // Reset to selection screen
+        function backToSelection() {
+            resultsContainer.classList.add('hidden');
+            quizContainer.classList.add('hidden');
+            quizSelection.classList.remove('hidden');
+        }
+
+        // Add event listeners
+        skipButton.addEventListener('click', skipQuestion);
+        nextButton.addEventListener('click', nextQuestion);
+        prevButton.addEventListener('click', prevQuestion);
+        restartButton.addEventListener('click', () => startQuiz(currentQuizType));
+        reviewButton.addEventListener('click', reviewIncorrectAnswers);
+        backToSelectionButton.addEventListener('click', backToSelection);
+    </script>
+
+
+</body></html>
