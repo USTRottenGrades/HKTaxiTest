@@ -2,7 +2,7 @@
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>香港的士考試溫習 | Hong Kong Taxi Exam Quiz</title>
+    <title>香港的士考試練習 | Hong Kong Taxi Exam Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -36,7 +36,7 @@
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-4xl">
         <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold mb-2 text-primary"><button onclick="window.location.href = window.location.href;">香港的士考試溫習</button></h1>
+            <h1 class="text-3xl font-bold mb-2 text-primary"><button onclick="window.location.href = window.location.href;">香港的士考試練習</button></h1>
             <h2 class="text-xl mb-4">Hong Kong Taxi Exam Practice</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400">基於的士筆試地方及路線試題小冊子</p>
         </header>
@@ -178,326 +178,326 @@
         const mapElement = document.getElementById('map');
 
         // Location quiz data
-        const locationQuizData = [
-            { place: "瑪麗醫院", location: "薄扶林" },
-            { place: "威爾斯親王醫院", location: "沙田" },
-            { place: "贊育醫院", location: "西營盤" },
-            { place: "東華醫院", location: "上環" },
-            { place: "東華三院馮堯敬醫院", location: "薄扶林" },
-            { place: "葛量洪醫院", location: "黃竹坑" },
-            { place: "東區尤德夫人那打素醫院", location: "柴灣" },
-            { place: "東華東院", location: "大坑" },
-            { place: "鄧肇堅醫院", location: "灣仔" },
-            { place: "律敦治醫院", location: "灣仔" },
-            { place: "黃竹坑醫院", location: "黃竹坑徑" },
-            { place: "伊利沙伯醫院", location: "油麻地" },
-            { place: "九龍醫院", location: "九龍城" },
-            { place: "香港佛教醫院", location: "樂富" },
-            { place: "香港眼科醫院", location: "九龍城" },
-            { place: "東華三院黃大仙醫院", location: "沙田坳道" },
-            { place: "聖母醫院", location: "黃大仙" },
-            { place: "廣華醫院", location: "油麻地" },
-            { place: "明愛醫院", location: "長沙灣" },
-            { place: "瑪嘉烈醫院", location: "荔景" },
-            { place: "葵涌醫院", location: "荔景" },
-            { place: "仁濟醫院", location: "荃灣" },
-            { place: "基督教聯合醫院", location: "秀茂坪" },
-            { place: "靈實醫院", location: "將軍澳" },
-            { place: "將軍澳醫院", location: "寶寧里" },
-            { place: "沙田醫院", location: "亞公角街" },
-            { place: "雅麗氏何妙齡那打素醫院", location: "大埔" },
-            { place: "大埔醫院", location: "全安路" },
-            { place: "北區醫院", location: "上水" },
-            { place: "屯門醫院", location: "青松觀路" },
-            { place: "博愛醫院", location: "元朗" },
-            { place: "嘉諾撒醫院", location: "半山" },
-            { place: "明德國際醫院", location: "山頂" },
-            { place: "香港港安醫院", location: "跑馬地" },
-            { place: "聖保祿醫院", location: "東院道" },
-            { place: "養和醫院", location: "跑馬地" },
-            { place: "寶血醫院（明愛）", location: "深水埗" },
-            { place: "播道醫院", location: "九龍城" },
-            { place: "聖德肋撒醫院", location: "九龍城" },
-            { place: "香港浸信會醫院", location: "九龍塘" },
-            { place: "荃灣港安醫院", location: "荃景圍" },
-            { place: "沙田國際醫務中心仁安醫院", location: "富健街" },
-            { place: "青山醫院", location: "屯門" },
-            { place: "小欖醫院", location: "青松觀路" },
-            { place: "大口環根德公爵夫人兒童醫院", location: "薄扶林" },
-            { place: "北大嶼山醫院", location: "松仁路" },
-            { place: "天水圍醫院", location: "天壇街" },
-            { place: "港怡醫院", location: "黃竹坑" },
-            { place: "香港兒童醫院", location: "九龍灣" },
-            { place: "香港中文大學醫院", location: "澤祥街" },
-            { place: "星光大道", location: "尖沙咀" },
-            { place: "金紫荊廣場", location: "灣仔" },
-            { place: "香港迪士尼樂園", location: "竹篙灣" },
-            { place: "香港濕地公園", location: "天水圍" },
-            { place: "玉器市場", location: "油麻地" },
-            { place: "九龍寨城公園", location: "九龍城" },
-            { place: "昂坪纜車 - 東涌纜車站", location: "達東路" },
-            { place: "香港海洋公園", location: "黃竹坑" },
-            { place: "寶蓮禪寺", location: "昂坪" },
-            { place: "凌霄閣", location: "山頂道" },
-            { place: "亞洲國際博覽館", location: "赤鱲角" },
-            { place: "屏山文物徑", location: "元朗" },
-            { place: "香港會議展覽中心", location: "灣仔" },
-            { place: "香港文化博物館", location: "沙田" },
-            { place: "香港歷史博物館", location: "尖沙咀" },
-            { place: "香港科學館", location: "尖沙咀" },
-            { place: "香港太空館", location: "尖沙咀" },
-            { place: "香港大會堂", location: "中環" },
-            { place: "香港體育館", location: "紅磡" },
-            { place: "香港文化中心", location: "尖沙咀" },
-            { place: "伊利沙伯體育館", location: "灣仔" },
-            { place: "沙田大會堂", location: "源禾路" },
-            { place: "尖沙咀天星碼頭", location: "尖沙咀" },
-            { place: "1881", location: "廣東道" },
-            { place: "沙田車公廟", location: "大圍" },
-            { place: "文武廟", location: "上環" },
-            { place: "林村許願廣場", location: "大埔" },
-            { place: "龍躍頭文物徑", location: "粉嶺" },
-            { place: "美利樓", location: "赤柱" },
-            { place: "和昌大押", location: "莊士敦道" },
-            { place: "大館", location: "荷李活道" },
-            { place: "香港藝術館", location: "尖沙咀" },
-            { place: "啟德郵輪碼頭", location: "承豐道" },
-            { place: "香港故宮文化博物館", location: "博物館道" },
-            { place: "戲曲中心", location: "柯士甸道西" },
-            { place: "8度海逸酒店", location: "土瓜灣" },
-            { place: "九龍海逸君綽酒店", location: "紅磡" },
-            { place: "九龍維景酒店", location: "何文田" },
-            { place: "九龍酒店", location: "尖沙咀" },
-            { place: "九龍香格里拉大酒店", location: "尖沙咀" },
-            { place: "六國酒店", location: "灣仔" },
-            { place: "北角海逸酒店", location: "英皇道" },
-            { place: "千禧新世界香港酒店", location: "尖沙咀" },
-            { place: "君怡酒店", location: "尖沙咀" },
-            { place: "嘉湖海逸酒店", location: "天水圍" },
-            { place: "富豪九龍酒店", location: "尖沙咀" },
-            { place: "富豪東方酒店", location: "九龍城" },
-            { place: "富豪香港酒店", location: "銅鑼灣" },
-            { place: "帝京酒店", location: "旺角" },
-            { place: "帝景酒店", location: "汀九" },
-            { place: "帝苑酒店", location: "尖沙咀" },
-            { place: "帝都酒店", location: "沙田" },
-            { place: "柏寧酒店", location: "銅鑼灣" },
-            { place: "港島英迪格酒店", location: "灣仔" },
-            { place: "皇家太平洋酒店", location: "尖沙咀" },
-            { place: "諾富特東薈城酒店", location: "東涌" },
-            { place: "都會海逸酒店", location: "紅磡" },
-            { place: "香港半島酒店", location: "尖沙咀" },
-            { place: "香港君悅酒店", location: "灣仔" },
-            { place: "香港喜來登酒店", location: "尖沙咀" },
-            { place: "香港四季酒店", location: "中環" },
-            { place: "香港天際萬豪酒店", location: "赤鱲角" },
-            { place: "香港康得思酒店", location: "上海街" },
-            { place: "香港文華東方酒店", location: "中環" },
-            { place: "香港朗廷酒店", location: "尖沙咀" },
-            { place: "香港沙田凱悅酒店", location: "澤祥街" },
-            { place: "香港麗晶酒店", location: "尖沙咀" },
-            { place: "香港港麗酒店", location: "金鐘" },
-            { place: "香港灣仔帝盛酒店", location: "皇后大道東" },
-            { place: "香港珀麗酒店", location: "銅鑼灣" },
-            { place: "香港百樂酒店", location: "尖沙咀" },
-            { place: "粵海華美灣際酒店", location: "灣仔" },
-            { place: "香港萬麗海景酒店", location: "灣仔" },
-            { place: "香港諾富特世紀酒店", location: "灣仔" },
-            { place: "香港金域假日酒店", location: "尖沙咀" },
-            { place: "香港銅鑼灣皇冠假日酒店", location: "禮頓道" },
-            { place: "香港黃金海岸酒店", location: "掃管笏" },
-            { place: "馬哥孛羅香港酒店", location: "尖沙咀" },
-            { place: "麗豪酒店", location: "沙田" },
-            { place: "香港維港凱悅尚萃酒店", location: "北角" },
-            { place: "唯港薈", location: "尖沙咀" },
-            { place: "奧華酒店南岸", location: "黃竹坑" },
-            { place: "南灣如心酒店", location: "香港仔" },
-            { place: "荃灣西如心酒店", location: "楊屋道" },
-            { place: "九龍東如心酒店", location: "觀塘" },
-            { place: "銅鑼灣如心酒店", location: "英皇道" },
-            { place: "富豪機場酒店會議中心", location: "赤鱲角" },
-            { place: "尖沙咀皇悅酒店", location: "金巴利道" },
-            { place: "海景嘉福洲際酒店", location: "尖沙咀" },
-            { place: "港威酒店", location: "尖沙咀" },
-            { place: "港島海逸君綽酒店", location: "北角" },
-            { place: "港島皇悅酒店", location: "軒尼詩道" },
-            { place: "港島香格里拉大酒店", location: "法院道" },
-            { place: "美麗華酒店", location: "尖沙咀" },
-            { place: "華美達海景酒店", location: "皇后大道西" },
-            { place: "迪士尼好萊塢酒店", location: "大嶼山" },
-            { place: "迪士尼探索家度假酒店", location: "竹篙灣" },
-            { place: "銅鑼灣皇悅酒店", location: "永興街" },
-            { place: "香港W酒店", location: "柯士甸道西" },
-            { place: "香港JW萬豪酒店", location: "金鐘道" },
-            { place: "香港九龍東皇冠假日酒店", location: "將軍澳" },
-            { place: "香港嘉里酒店", location: "紅磡" },
-            { place: "香港尖沙咀凱悦酒店", location: "河內道" },
-            { place: "香港屯門貝爾特酒店", location: "震寰路" },
-            { place: "香港旺角帝盛酒店", location: "大角咀" },
-            { place: "香港東隅", location: "鰂魚涌" },
-            { place: "香港沙田萬怡酒店", location: "安平街" },
-            { place: "名迪港島酒店", location: "摩頓臺" },
-            { place: "香港瑰麗酒店", location: "尖沙咀" },
-            { place: "香港美利酒店", location: "中環" },
-            { place: "香港萬怡酒店", location: "干諾道西" },
-            { place: "香港觀塘帝盛酒店", location: "鴻圖道" },
-            { place: "香港迪士尼樂園酒店", location: "竹篙灣" },
-            { place: "香港逸東酒店", location: "佐敦" },
-            { place: "香港麗思卡爾頓酒店", location: "柯士甸道西" },
-            { place: "帝逸酒店", location: "沙田" },
-            { place: "WM酒店", location: "西貢" },
-            { place: "歷山酒店", location: "北角" },
-            { place: "香港瑞吉酒店", location: "灣仔" },
-            { place: "香港東涌世茂喜來登酒店", location: "怡東路" },
-            { place: "香港富麗敦海洋公園酒店", location: "香港仔" },
-            { place: "麗豪航天城酒店", location: "赤鱲角" },
-            { place: "北角政府合署", location: "渣華道" },
-            { place: "長沙灣政府合署", location: "長沙灣道" },
-            { place: "何文田政府合署", location: "忠孝街" },
-            { place: "東九龍政府合署", location: "觀塘" },
-            { place: "九龍政府合署", location: "油麻地" },
-            { place: "葵興政府合署", location: "興芳路" },
-            { place: "荔枝角政府合署", location: "荔灣道" },
-            { place: "馬頭角道政府合署", location: "馬頭角道" },
-            { place: "旺角政府合署", location: "聯運街" },
-            { place: "梅窩政府合署", location: "銀鑛灣路" },
-            { place: "牛頭角政府合署", location: "安華街" },
-            { place: "北區政府合署", location: "粉嶺" },
-            { place: "培正道政府合署", location: "何文田" },
-            { place: "西貢政府合署", location: "親民街" },
-            { place: "沙田政府合署", location: "上禾輋路" },
-            { place: "深水埗政府合署", location: "元州街" },
-            { place: "大興政府合署", location: "屯門" },
-            { place: "大埔政府合署", location: "汀角路" },
-            { place: "土瓜灣政府合署", location: "馬頭圍道" },
-            { place: "荃灣政府合署", location: "西樓角路" },
-            { place: "屯門政府合署", location: "屯喜路" },
-            { place: "元朗政府合署", location: "橋樂坊" },
-            { place: "觀塘區警署", location: "鯉魚門道" },
-            { place: "旺角區警署", location: "太子道西" },
-            { place: "將軍澳區警署", location: "寶琳北路" },
-            { place: "荃灣區警署", location: "荃景圍" },
-            { place: "中區警區總部", location: "中港道" },
-            { place: "東區法院大樓", location: "西灣河" },
-            { place: "終審法院", location: "中環" },
-            { place: "立法會綜合大樓", location: "金鐘" },
-            { place: "香港禮賓府", location: "中環" },
-            { place: "香港中央圖書館", location: "銅鑼灣" },
-            { place: "醫院管理局大樓", location: "九龍城" },
-            { place: "九龍城法院大樓", location: "亞皆老街" },
-            { place: "觀塘法院大樓", location: "鯉魚門道" },
-            { place: "粉嶺法院大樓", location: "璧峰路" },
-            { place: "沙田法院大樓", location: "宜正里" },
-            { place: "屯門法院大樓", location: "屯喜路" },
-            { place: "西九龍法院大樓", location: "通州街" },
-            { place: "高等法院", location: "金鐘道" },
-            { place: "勞資審裁處", location: "加士居道" },
-            { place: "土地審裁處", location: "加士居道" },
-            { place: "區域法院", location: "港灣道" },
-            { place: "西九龍政府合署", location: "海庭道" },
-            { place: "入境事務處總部", location: "將軍澳" },
-            { place: "機電工程署總部大樓", location: "啟成街" },
-            { place: "中環中心", location: "皇后大道中" },
-            { place: "如心廣場", location: "荃灣" },
-            { place: "長江集團中心", location: "中環" },
-            { place: "利園", location: "銅鑼灣" },
-            { place: "新鴻基中心", location: "灣仔" },
-            { place: "華懋交易廣場", location: "鰂魚涌" },
-            { place: "力寶中心", location: "金鐘" },
-            { place: "美麗華廣場", location: "尖沙咀" },
-            { place: "太古廣場", location: "金鐘" },
-            { place: "英國保誠保險大樓", location: "尖沙咀" },
-            { place: "中國太平大廈", location: "新寧道" },
-            { place: "電視廣播有限公司電視廣播城", location: "將軍澳" },
-            { place: "港威大廈", location: "尖沙咀" },
-            { place: "貿易廣場", location: "長沙灣" },
-            { place: "海富中心", location: "夏慤道" },
-            { place: "統一中心", location: "金鐘" },
-            { place: "環球大廈", location: "中環" },
-            { place: "國際金融中心", location: "中環" },
-            { place: "環球貿易廣場", location: "柯士甸道西" },
-            { place: "中環廣場", location: "港灣道" },
-            { place: "中銀大廈", location: "花園道" },
-            { place: "港島東中心", location: "鰂魚涌" },
-            { place: "中遠大廈", location: "皇后大道中" },
-            { place: "怡和大廈", location: "中環" },
-            { place: "永安集團大廈", location: "德輔道中" },
-            { place: "香港滙豐總行大廈", location: "中環" },
-            { place: "合和中心", location: "灣仔" },
-            { place: "圓方", location: "柯士甸道西" },
-            { place: "又一城", location: "達之路" },
-            { place: "海港城", location: "尖沙咀" },
-            { place: "置地廣場", location: "中環" },
-            { place: "上水廣場", location: "龍琛路" },
-            { place: "朗豪坊", location: "旺角" },
-            { place: "荷里活廣場", location: "鑽石山" },
-            { place: "時代廣場", location: "銅鑼灣" },
-            { place: "西港城", location: "上環" },
-            { place: "黃埔新天地", location: "紅磡" },
-            { place: "元創方", location: "鴨巴甸街" },
-            { place: "世貿中心", location: "告士打道" },
-            { place: "K11購物藝術館", location: "河內道" },
-            { place: "青衣城", location: "青敬路" },
-            { place: "新城市廣場", location: "沙田" },
-            { place: "奧海城2期", location: "海庭道" },
-            { place: "崇光銅鑼灣店", location: "軒尼詩道" },
-            { place: "屯門市廣場", location: "屯順街" },
-            { place: "中港城", location: "尖沙咀" },
-            { place: "東薈城名店倉", location: "東涌" },
-            { place: "利舞臺", location: "銅鑼灣" },
-            { place: "南豐紗廠", location: "白田壩街" },
-            { place: "K11人文購物藝術館", location: "梳士巴利道" },
-            { place: "裕民坊", location: "觀塘" },
-            { place: "AIRSIDE", location: "啟德" },
-            { place: "圍方", location: "車公廟路" },
-            { place: "APM", location: "觀塘" },
-            { place: "V Walk", location: "深旺道" },
-            { place: "德福花園", location: "偉業街" },
-            { place: "淘大花園", location: "九龍灣" },
-            { place: "匯景花園", location: "藍田" },
-            { place: "綠楊新邨", location: "荃灣" },
-            { place: "盈翠半島", location: "青衣" },
-            { place: "港灣豪庭", location: "福利街" },
-            { place: "新屯門中心", location: "龍門路" },
-            { place: "錦綉花園", location: "元朗" },
-            { place: "嘉湖山莊", location: "天水圍" },
-            { place: "美孚新邨", location: "荔枝角" },
-            { place: "太古城", location: "鰂魚涌" },
-            { place: "沙田第一城", location: "小瀝源路" },
-            { place: "黃埔花園", location: "紅磡" },
-            { place: "海怡半島", location: "鴨脷洲" },
-            { place: "麗港城", location: "觀塘" },
-            { place: "愉景灣", location: "大嶼山" },
-            { place: "新都城", location: "寶林" },
-            { place: "杏花邨", location: "柴灣" },
-            { place: "麗城花園", location: "荃灣" },
-            { place: "映灣園", location: "東涌" },
-            { place: "珀麗灣", location: "馬灣" },
-            { place: "維景灣畔", location: "調景嶺" },
-            { place: "海逸豪園", location: "紅磡" },
-            { place: "置富花園", location: "薄扶林" },
-            { place: "將軍澳中心", location: "唐德街" },
-            { place: "大埔中心", location: "安邦路" },
-            { place: "東堤灣畔", location: "東涌" },
-            { place: "新港城", location: "馬鞍山" },
-            { place: "富榮花園", location: "海庭道" },
-            { place: "海山樓", location: "鰂魚涌" },
-            { place: "嘉匯", location: "沐寧街" },
-            { place: "擎天半島", location: "柯士甸道西" },
-            { place: "形點", location: "朗日路" },
-            { place: "香港恒生大學", location: "小瀝源" },
-            { place: "香港城市大學", location: "九龍塘" },
-            { place: "香港浸會大學", location: "九龍塘" },
-            { place: "香港樹仁大學", location: "北角" },
-            { place: "嶺南大學", location: "屯門" },
-            { place: "香港中文大學", location: "沙田" },
-            { place: "香港教育大學", location: "大埔" },
-            { place: "香港理工大學", location: "紅磡" },
-            { place: "香港科技大學", location: "清水灣" },
-            { place: "香港都會大學", location: "何文田" },
-            { place: "香港大學本部大樓", location: "般咸道" },
-            { place: "聖方濟各大學", location: "翠嶺里" }
-        ];
+        locationQuizData = [
+            { place: "瑪麗醫院", location: "薄扶林", lat: 22.269962, lng: 114.1312907 },
+            { place: "威爾斯親王醫院", location: "沙田", lat: 22.38125, lng: 114.20162 },
+            { place: "贊育醫院", location: "西營盤", lat: 22.2861959, lng: 114.1445947 },
+            { place: "東華醫院", location: "上環", lat: 22.285101, lng: 114.146545 },
+            { place: "東華三院馮堯敬醫院", location: "薄扶林", lat: 22.2714702, lng: 114.1248484 },
+            { place: "葛量洪醫院", location: "黃竹坑", lat: 22.2459198, lng: 114.1664957 },
+            { place: "東區尤德夫人那打素醫院", location: "柴灣", lat: 22.2695993, lng: 114.2362653 },
+            { place: "東華東院", location: "大坑", lat: 22.2754598, lng: 114.1908047 },
+            { place: "鄧肇堅醫院", location: "灣仔", lat: 22.2755944, lng: 114.1777194 },
+            { place: "律敦治醫院", location: "灣仔", lat: 22.2758454, lng: 114.1753051 },
+            { place: "黃竹坑醫院", location: "黃竹坑徑", lat: 22.2510939, lng: 114.1759364 },
+            { place: "伊利沙伯醫院", location: "油麻地", lat: 22.3086169, lng: 114.1747227 },
+            { place: "九龍醫院", location: "九龍城", lat: 22.3306602, lng: 114.1920172 },
+            { place: "香港佛教醫院", location: "樂富", lat: 22.3356331, lng: 114.1883828 },
+            { place: "香港眼科醫院", location: "九龍城", lat: 22.3249163, lng: 114.1845098 },
+            { place: "東華三院黃大仙醫院", location: "沙田坳道", lat: 22.3469363, lng: 114.196536 },
+            { place: "聖母醫院", location: "黃大仙", lat: 22.3456548, lng: 114.1966145 },
+            { place: "廣華醫院", location: "油麻地", lat: 22.3144134, lng: 114.1722412 },
+            { place: "明愛醫院", location: "長沙灣", lat: 22.340074, lng: 114.151591 },
+            { place: "瑪嘉烈醫院", location: "荔景", lat: 22.341361, lng: 114.1338213 },
+            { place: "葵涌醫院", location: "荔景", lat: 22.3429092, lng: 114.1336731 },
+            { place: "仁濟醫院", location: "荃灣", lat: 22.369918, lng: 114.119485 },
+            { place: "基督教聯合醫院", location: "秀茂坪", lat: 22.3234273, lng: 114.2275646 },
+            { place: "靈實醫院", location: "將軍澳", lat: 22.3141786, lng: 114.2564677 },
+            { place: "將軍澳醫院", location: "寶寧里", lat: 22.3182761, lng: 114.2697606 },
+            { place: "沙田醫院", location: "亞公角街", lat: 22.398076, lng: 114.212764 },
+            { place: "雅麗氏何妙齡那打素醫院", location: "大埔", lat: 22.4586917, lng: 114.1747667 },
+            { place: "大埔醫院", location: "全安路", lat: 22.4612811, lng: 114.1747755 },
+            { place: "北區醫院", location: "上水", lat: 22.4968697, lng: 114.1246908 },
+            { place: "屯門醫院", location: "青松觀路", lat: 22.407486, lng: 113.976323 },
+            { place: "博愛醫院", location: "元朗", lat: 22.4445484, lng: 114.0222095 },
+            { place: "嘉諾撒醫院", location: "半山", lat: 22.2773652, lng: 114.1538561 },
+            { place: "明德國際醫院", location: "山頂", lat: 22.259805, lng: 114.149526 },
+            { place: "香港港安醫院", location: "跑馬地", lat: 22.2634133, lng: 114.1841954 },
+            { place: "聖保祿醫院", location: "東院道", lat: 22.278467, lng: 114.1882198 },
+            { place: "養和醫院", location: "跑馬地", lat: 22.269235, lng: 114.1830406 },
+            { place: "寶血醫院（明愛）", location: "深水埗", lat: 22.3338708, lng: 114.1617508 },
+            { place: "播道醫院", location: "九龍城", lat: 22.3251652, lng: 114.1869162 },
+            { place: "聖德肋撒醫院", location: "九龍城", lat: 22.3262591, lng: 114.184829 },
+            { place: "香港浸信會醫院", location: "九龍塘", lat: 22.3398475, lng: 114.1798555 },
+            { place: "荃灣港安醫院", location: "荃景圍", lat: 22.3767395, lng: 114.1042874 },
+            { place: "沙田國際醫務中心仁安醫院", location: "富健街", lat: 22.3606398, lng: 114.1752751 },
+            { place: "青山醫院", location: "屯門", lat: 22.408538, lng: 113.9737562 },
+            { place: "小欖醫院", location: "青松觀路", lat: 22.4100517, lng: 113.9748925 },
+            { place: "大口環根德公爵夫人兒童醫院", location: "薄扶林", lat: 22.2711651, lng: 114.1234051 },
+            { place: "北大嶼山醫院", location: "松仁路", lat: 22.2820281, lng: 113.9392707 },
+            { place: "天水圍醫院", location: "天壇街", lat: 22.4584632, lng: 113.9958452 },
+            { place: "港怡醫院", location: "黃竹坑", lat: 22.2515672, lng: 114.1763966 },
+            { place: "香港兒童醫院", location: "九龍灣", lat: 22.3152999, lng: 114.209468 },
+            { place: "香港中文大學醫院", location: "澤祥街", lat: 22.4136093, lng: 114.2113817 },
+            { place: "星光大道", location: "尖沙咀", lat: 22.2930046, lng: 114.1741517 },
+            { place: "金紫荊廣場", location: "灣仔", lat: 22.284425, lng: 114.1739009 },
+            { place: "香港迪士尼樂園", location: "竹篙灣", lat: 22.3129666, lng: 114.0412819 },
+            { place: "香港濕地公園", location: "天水圍", lat: 22.4700585, lng: 114.0065831 },
+            { place: "玉器市場", location: "油麻地", lat: 22.3095032, lng: 114.1700524 },
+            { place: "九龍寨城公園", location: "九龍城", lat: 22.3321296, lng: 114.1903285 },
+            { place: "昂坪纜車 - 東涌纜車站", location: "達東路", lat: 22.290337, lng: 113.938363 },
+            { place: "香港海洋公園", location: "黃竹坑", lat: 22.2466607, lng: 114.1757239 },
+            { place: "寶蓮禪寺", location: "昂坪", lat: 22.2554806, lng: 113.9078801 },
+            { place: "凌霄閣", location: "山頂道", lat: 22.2712357, lng: 114.1499638 },
+            { place: "亞洲國際博覽館", location: "赤鱲角", lat: 22.321343, lng: 113.943288 },
+            { place: "屏山文物徑", location: "元朗", lat: 22.4461535, lng: 114.0060257 },
+            { place: "香港會議展覽中心", location: "灣仔", lat: 22.2833754, lng: 114.1731385 },
+            { place: "香港文化博物館", location: "沙田", lat: 22.3770481, lng: 114.1857103 },
+            { place: "香港歷史博物館", location: "尖沙咀", lat: 22.3018851, lng: 114.1772612 },
+            { place: "香港科學館", location: "尖沙咀", lat: 22.301388, lng: 114.1765585 },
+            { place: "香港太空館", location: "尖沙咀", lat: 22.2942262, lng: 114.1718723 },
+            { place: "香港大會堂", location: "中環", lat: 22.2822389, lng: 114.1616361 },
+            { place: "香港體育館", location: "紅磡", lat: 22.3012694, lng: 114.182023 },
+            { place: "香港文化中心", location: "尖沙咀", lat: 22.2938496, lng: 114.1703232 },
+            { place: "伊利沙伯體育館", location: "灣仔", lat: 22.2751248, lng: 114.1790164 },
+            { place: "沙田大會堂", location: "源禾路", lat: 22.3812484, lng: 114.1899337 },
+            { place: "尖沙咀天星碼頭", location: "尖沙咀", lat: 22.293763, lng: 114.168748 },
+            { place: "1881", location: "廣東道", lat: 22.2954731, lng: 114.1699524 },
+            { place: "沙田車公廟", location: "大圍", lat: 22.373419, lng: 114.182831 },
+            { place: "文武廟", location: "上環", lat: 22.2839729, lng: 114.1501999 },
+            { place: "林村許願廣場", location: "大埔", lat: 22.4567851, lng: 114.1424556 },
+            { place: "龍躍頭文物徑", location: "粉嶺", lat: 22.4992066, lng: 114.1520523 },
+            { place: "美利樓", location: "赤柱", lat: 22.2180281, lng: 114.2097775 },
+            { place: "和昌大押", location: "莊士敦道", lat: 22.2763125, lng: 114.1714565 },
+            { place: "大館", location: "荷李活道", lat: 22.2811686, lng: 114.154023 },
+            { place: "香港藝術館", location: "尖沙咀", lat: 22.2936055, lng: 114.1721324 },
+            { place: "啟德郵輪碼頭", location: "承豐道", lat: 22.3061156, lng: 114.2132375 },
+            { place: "香港故宮文化博物館", location: "博物館道", lat: 22.30177, lng: 114.1564 },
+            { place: "戲曲中心", location: "柯士甸道西", lat: 22.3021749, lng: 114.1672715 },
+            { place: "8度海逸酒店", location: "土瓜灣", lat: 22.3229344, lng: 114.1906691 },
+            { place: "九龍海逸君綽酒店", location: "紅磡", lat: 22.302697, lng: 114.1923311 },
+            { place: "九龍維景酒店", location: "何文田", lat: 22.3194297, lng: 114.1758412 },
+            { place: "九龍酒店", location: "尖沙咀", lat: 22.2957152, lng: 114.1717745 },
+            { place: "九龍香格里拉大酒店", location: "尖沙咀", lat: 22.297137, lng: 114.1770839 },
+            { place: "六國酒店", location: "灣仔", lat: 22.278865, lng: 114.172354 },
+            { place: "北角海逸酒店", location: "英皇道", lat: 22.2915378, lng: 114.2086321 },
+            { place: "千禧新世界香港酒店", location: "尖沙咀", lat: 22.2988123, lng: 114.1721746 },
+            { place: "君怡酒店", location: "尖沙咀", lat: 22.3005109, lng: 114.1737953 },
+            { place: "嘉湖海逸酒店", location: "天水圍", lat: 22.4575256, lng: 114.0043749 },
+            { place: "富豪九龍酒店", location: "尖沙咀", lat: 22.298849, lng: 114.178027 },
+            { place: "富豪東方酒店", location: "九龍城", lat: 22.3300395, lng: 114.1929201 },
+            { place: "富豪香港酒店", location: "銅鑼灣", lat: 22.279153, lng: 114.186825 },
+            { place: "帝京酒店", location: "旺角", lat: 22.3242126, lng: 114.17312 },
+            { place: "帝景酒店", location: "汀九", lat: 22.3684504, lng: 114.0780214 },
+            { place: "帝苑酒店", location: "尖沙咀", lat: 22.298656, lng: 114.177338 },
+            { place: "帝都酒店", location: "沙田", lat: 22.3798552, lng: 114.1884978 },
+            { place: "柏寧酒店", location: "銅鑼灣", lat: 22.2811814, lng: 114.1864262 },
+            { place: "港島英迪格酒店", location: "灣仔", lat: 22.2748068, lng: 114.1733125 },
+            { place: "皇家太平洋酒店", location: "尖沙咀", lat: 22.3001702, lng: 114.1680287 },
+            { place: "諾富特東薈城酒店", location: "東涌", lat: 22.291156, lng: 113.9423551 },
+            { place: "都會海逸酒店", location: "紅磡", lat: 22.3013425, lng: 114.1832283 },
+            { place: "香港半島酒店", location: "尖沙咀", lat: 22.2951024, lng: 114.1718537 },
+            { place: "香港君悅酒店", location: "灣仔", lat: 22.2811128, lng: 114.1719657 },
+            { place: "香港喜來登酒店", location: "尖沙咀", lat: 22.2952177, lng: 114.17261 },
+            { place: "香港四季酒店", location: "中環", lat: 22.2866377, lng: 114.156647 },
+            { place: "香港天際萬豪酒店", location: "赤鱲角", lat: 22.317823, lng: 113.943278 },
+            { place: "香港康得思酒店", location: "上海街", lat: 22.318175, lng: 114.168112 },
+            { place: "香港文華東方酒店", location: "中環", lat: 22.2818794, lng: 114.1594433 },
+            { place: "香港朗廷酒店", location: "尖沙咀", lat: 22.2963977, lng: 114.1697461 },
+            { place: "香港沙田凱悅酒店", location: "澤祥街", lat: 22.4117216, lng: 114.2112101 },
+            { place: "香港麗晶酒店", location: "尖沙咀", lat: 22.2934362, lng: 114.1739346 },
+            { place: "香港港麗酒店", location: "金鐘", lat: 22.2766755, lng: 114.1654058 },
+            { place: "香港灣仔帝盛酒店", location: "皇后大道東", lat: 22.274559, lng: 114.178936 },
+            { place: "香港珀麗酒店", location: "銅鑼灣", lat: 22.2791667, lng: 114.1883333 },
+            { place: "香港百樂酒店", location: "尖沙咀", lat: 22.2996441, lng: 114.1754722 },
+            { place: "粵海華美灣際酒店", location: "灣仔", lat: 22.2783586, lng: 114.1711064 },
+            { place: "香港萬麗海景酒店", location: "灣仔", lat: 22.2814527, lng: 114.1738372 },
+            { place: "香港諾富特世紀酒店", location: "灣仔", lat: 22.2788043, lng: 114.176386 },
+            { place: "香港金域假日酒店", location: "尖沙咀", lat: 22.2967855, lng: 114.1727739 },
+            { place: "香港銅鑼灣皇冠假日酒店", location: "禮頓道", lat: 22.2769914, lng: 114.1826942 },
+            { place: "香港黃金海岸酒店", location: "掃管笏", lat: 22.3717971, lng: 113.9894773 },
+            { place: "馬哥孛羅香港酒店", location: "尖沙咀", lat: 22.2951648, lng: 114.1688605 },
+            { place: "麗豪酒店", location: "沙田", lat: 22.3822082, lng: 114.1963102 },
+            { place: "香港維港凱悅尚萃酒店", location: "北角", lat: 22.292768, lng: 114.1989849 },
+            { place: "唯港薈", location: "尖沙咀", lat: 22.3007586, lng: 114.1796973 },
+            { place: "奧華酒店南岸", location: "黃竹坑", lat: 22.2459198, lng: 114.1664957 },
+            { place: "南灣如心酒店", location: "香港仔", lat: 22.2496433, lng: 114.1681462 },
+            { place: "荃灣西如心酒店", location: "楊屋道", lat: 22.3685909, lng: 114.1129769 },
+            { place: "九龍東如心酒店", location: "觀塘", lat: 22.3141482, lng: 114.219058 },
+            { place: "銅鑼灣如心酒店", location: "英皇道", lat: 22.2832644, lng: 114.192838 },
+            { place: "富豪機場酒店會議中心", location: "赤鱲角", lat: 22.3186949, lng: 113.9343274 },
+            { place: "尖沙咀皇悅酒店", location: "金巴利道", lat: 22.3010058, lng: 114.1751035 },
+            { place: "海景嘉福洲際酒店", location: "尖沙咀", lat: 22.2990526, lng: 114.1793931 },
+            { place: "港威酒店", location: "尖沙咀", lat: 22.297756, lng: 114.168542 },
+            { place: "港島海逸君綽酒店", location: "北角", lat: 22.2890067, lng: 114.1918459 },
+            { place: "港島皇悅酒店", location: "軒尼詩道", lat: 22.2778068, lng: 114.1701009 },
+            { place: "港島香格里拉大酒店", location: "法院道", lat: 22.2771904, lng: 114.1644241 },
+            { place: "美麗華酒店", location: "尖沙咀", lat: 22.3003264, lng: 114.1722504 },
+            { place: "華美達海景酒店", location: "皇后大道西", lat: 22.28699, lng: 114.1435312 },
+            { place: "迪士尼好萊塢酒店", location: "大嶼山", lat: 22.309187, lng: 114.037334 },
+            { place: "迪士尼探索家度假酒店", location: "竹篙灣", lat: 22.3081634, lng: 114.0386053 },
+            { place: "銅鑼灣皇悅酒店", location: "永興街", lat: 22.2852143, lng: 114.192247 },
+            { place: "香港W酒店", location: "柯士甸道西", lat: 22.3048255, lng: 114.1605667 },
+            { place: "香港JW萬豪酒店", location: "金鐘道", lat: 22.277509, lng: 114.166341 },
+            { place: "香港九龍東皇冠假日酒店", location: "將軍澳", lat: 22.3085223, lng: 114.2600823 },
+            { place: "香港嘉里酒店", location: "紅磡", lat: 22.3013479, lng: 114.1882474 },
+            { place: "香港尖沙咀凱悦酒店", location: "河內道", lat: 22.2974584, lng: 114.1740116 },
+            { place: "香港屯門貝爾特酒店", location: "震寰路", lat: 22.3956509, lng: 113.9718717 },
+            { place: "香港旺角帝盛酒店", location: "大角咀", lat: 22.3212732, lng: 114.1622125 },
+            { place: "香港東隅", location: "鰂魚涌", lat: 22.2860064, lng: 114.2160626 },
+            { place: "香港沙田萬怡酒店", location: "安平街", lat: 22.3907979, lng: 114.2063027 },
+            { place: "名迪港島酒店", location: "摩頓臺", lat: 22.2791385, lng: 114.1892003 },
+            { place: "香港瑰麗酒店", location: "尖沙咀", lat: 22.2949764, lng: 114.175832 },
+            { place: "香港美利酒店", location: "中環", lat: 22.2780806, lng: 114.160106 },
+            { place: "香港萬怡酒店", location: "干諾道西", lat: 22.2879503, lng: 114.1388476 },
+            { place: "香港觀塘帝盛酒店", location: "鴻圖道", lat: 22.3080189, lng: 114.2242966 },
+            { place: "香港迪士尼樂園酒店", location: "竹篙灣", lat: 22.3081194, lng: 114.0440642 },
+            { place: "香港逸東酒店", location: "佐敦", lat: 22.3080409, lng: 114.1717101 },
+            { place: "香港麗思卡爾頓酒店", location: "柯士甸道西", lat: 22.3034032, lng: 114.1601907 },
+            { place: "帝逸酒店", location: "沙田", lat: 22.3836116, lng: 114.208223 },
+            { place: "WM酒店", location: "西貢", lat: 22.385398, lng: 114.2755701 },
+            { place: "歷山酒店", location: "北角", lat: 22.2895605, lng: 114.1927027 },
+            { place: "香港瑞吉酒店", location: "灣仔", lat: 22.2801126, lng: 114.174828 },
+            { place: "香港東涌世茂喜來登酒店", location: "怡東路", lat: 22.2956594, lng: 113.9461967 },
+            { place: "香港富麗敦海洋公園酒店", location: "香港仔", lat: 22.2369121, lng: 114.1655464 },
+            { place: "麗豪航天城酒店", location: "赤鱲角", lat: 22.3192383, lng: 113.9420082 },
+            { place: "北角政府合署", location: "渣華道", lat: 22.2922788, lng: 114.2084053 },
+            { place: "長沙灣政府合署", location: "長沙灣道", lat: 22.3317857, lng: 114.1602236 },
+            { place: "何文田政府合署", location: "忠孝街", lat: 22.314562, lng: 114.180343 },
+            { place: "東九龍政府合署", location: "觀塘", lat: 22.309595, lng: 114.22978 },
+            { place: "九龍政府合署", location: "油麻地", lat: 22.30943, lng: 114.1709404 },
+            { place: "葵興政府合署", location: "興芳路", lat: 22.3630657, lng: 114.1315536 },
+            { place: "荔枝角政府合署", location: "荔灣道", lat: 22.3401238, lng: 114.1385356 },
+            { place: "馬頭角道政府合署", location: "馬頭角道", lat: 22.3228029, lng: 114.1872614 },
+            { place: "旺角政府合署", location: "聯運街", lat: 22.321378, lng: 114.1725951 },
+            { place: "梅窩政府合署", location: "銀鑛灣路", lat: 22.2661676, lng: 113.99792 },
+            { place: "牛頭角政府合署", location: "安華街", lat: 22.3212222, lng: 114.2166788 },
+            { place: "北區政府合署", location: "粉嶺", lat: 22.4945671, lng: 114.1383114 },
+            { place: "培正道政府合署", location: "何文田", lat: 22.318301, lng: 114.177412 },
+            { place: "西貢政府合署", location: "親民街", lat: 22.3820295, lng: 114.2724391 },
+            { place: "沙田政府合署", location: "上禾輋路", lat: 22.385632, lng: 114.186962 },
+            { place: "深水埗政府合署", location: "元州街", lat: 22.3319772, lng: 114.163557 },
+            { place: "大興政府合署", location: "屯門", lat: 22.3998411, lng: 113.973491 },
+            { place: "大埔政府合署", location: "汀角路", lat: 22.450742, lng: 114.164568 },
+            { place: "土瓜灣政府合署", location: "馬頭圍道", lat: 22.3171467, lng: 114.1880584 },
+            { place: "荃灣政府合署", location: "西樓角路", lat: 22.3742679, lng: 114.1155801 },
+            { place: "屯門政府合署", location: "屯喜路", lat: 22.390367, lng: 113.976285 },
+            { place: "元朗政府合署", location: "橋樂坊", lat: 22.4455556, lng: 114.0269444 },
+            { place: "觀塘區警署", location: "鯉魚門道", lat: 22.3037818, lng: 114.2359347 },
+            { place: "旺角區警署", location: "太子道西", lat: 22.3243407, lng: 114.1690247 },
+            { place: "將軍澳區警署", location: "寶琳北路", lat: 22.3201431, lng: 114.2540285 },
+            { place: "荃灣區警署", location: "荃景圍", lat: 22.3764562, lng: 114.1072809 },
+            { place: "中區警區總部", location: "中港道", lat: 22.2891444, lng: 114.1482347 },
+            { place: "東區法院大樓", location: "西灣河", lat: 22.2843535, lng: 114.224114 },
+            { place: "終審法院", location: "中環", lat: 22.2809198, lng: 114.1603532 },
+            { place: "立法會綜合大樓", location: "金鐘", lat: 22.281171, lng: 114.166369 },
+            { place: "香港禮賓府", location: "中環", lat: 22.2786766, lng: 114.1574514 },
+            { place: "香港中央圖書館", location: "銅鑼灣", lat: 22.2799098, lng: 114.1896618 },
+            { place: "醫院管理局大樓", location: "九龍城", lat: 22.3243594, lng: 114.1832294 },
+            { place: "九龍城法院大樓", location: "亞皆老街", lat: 22.3252213, lng: 114.1852566 },
+            { place: "觀塘法院大樓", location: "鯉魚門道", lat: 22.3097598, lng: 114.2293906 },
+            { place: "粉嶺法院大樓", location: "璧峰路", lat: 22.4955616, lng: 114.139092 },
+            { place: "沙田法院大樓", location: "宜正里", lat: 22.3800532, lng: 114.1890913 },
+            { place: "屯門法院大樓", location: "屯喜路", lat: 22.390278, lng: 113.975556 },
+            { place: "西九龍法院大樓", location: "通州街", lat: 22.3312583, lng: 114.1530395 },
+            { place: "高等法院", location: "金鐘道", lat: 22.2783669, lng: 114.1633505 },
+            { place: "勞資審裁處", location: "加士居道", lat: 22.3078471, lng: 114.1730104 },
+            { place: "土地審裁處", location: "加士居道", lat: 22.308285, lng: 114.172734 },
+            { place: "區域法院", location: "港灣道", lat: 22.2801948, lng: 114.1724004 },
+            { place: "西九龍政府合署", location: "海庭道", lat: 22.3125331, lng: 114.1635216 },
+            { place: "入境事務處總部", location: "將軍澳", lat: 22.3056152, lng: 114.2574336 },
+            { place: "機電工程署總部大樓", location: "啟成街", lat: 22.3258736, lng: 114.2035786 },
+            { place: "中環中心", location: "皇后大道中", lat: 22.2846202, lng: 114.1547347 },
+            { place: "如心廣場", location: "荃灣", lat: 22.368611, lng: 114.113056 },
+            { place: "長江集團中心", location: "中環", lat: 22.2794704, lng: 114.1603101 },
+            { place: "利園", location: "銅鑼灣", lat: 22.278333, lng: 114.184611 },
+            { place: "新鴻基中心", location: "灣仔", lat: 22.2804712, lng: 114.176978 },
+            { place: "華懋交易廣場", location: "鰂魚涌", lat: 22.2880754, lng: 114.2117901 },
+            { place: "力寶中心", location: "金鐘", lat: 22.279536, lng: 114.16335 },
+            { place: "美麗華廣場", location: "尖沙咀", lat: 22.3010487, lng: 114.1722875 },
+            { place: "太古廣場", location: "金鐘", lat: 22.2772459, lng: 114.1649087 },
+            { place: "英國保誠保險大樓", location: "尖沙咀", lat: 22.298729, lng: 114.167775 },
+            { place: "中國太平大廈", location: "新寧道", lat: 22.2779109, lng: 114.1855686 },
+            { place: "電視廣播有限公司電視廣播城", location: "將軍澳", lat: 22.3089111, lng: 114.2635572 },
+            { place: "港威大廈", location: "尖沙咀", lat: 22.2974784, lng: 114.1687395 },
+            { place: "貿易廣場", location: "長沙灣", lat: 22.336875, lng: 114.154192 },
+            { place: "海富中心", location: "夏慤道", lat: 22.279531, lng: 114.165196 },
+            { place: "統一中心", location: "金鐘", lat: 22.2784312, lng: 114.1654177 },
+            { place: "環球大廈", location: "中環", lat: 22.2825285, lng: 114.1578668 },
+            { place: "國際金融中心", location: "中環", lat: 22.285, lng: 114.159167 },
+            { place: "環球貿易廣場", location: "柯士甸道西", lat: 22.3034032, lng: 114.1601907 },
+            { place: "中環廣場", location: "港灣道", lat: 22.2799097, lng: 114.1737282 },
+            { place: "中銀大廈", location: "花園道", lat: 22.2793043, lng: 114.1614931 },
+            { place: "港島東中心", location: "鰂魚涌", lat: 22.2862479, lng: 114.2135458 },
+            { place: "中遠大廈", location: "皇后大道中", lat: 22.2855335, lng: 114.1529461 },
+            { place: "怡和大廈", location: "中環", lat: 22.2830289, lng: 114.1589161 },
+            { place: "永安集團大廈", location: "德輔道中", lat: 22.283883, lng: 114.156478 },
+            { place: "香港滙豐總行大廈", location: "中環", lat: 22.2801958, lng: 114.1593852 },
+            { place: "合和中心", location: "灣仔", lat: 22.2746386, lng: 114.1717253 },
+            { place: "圓方", location: "柯士甸道西", lat: 22.3046472, lng: 114.1611085 },
+            { place: "又一城", location: "達之路", lat: 22.337381, lng: 114.1744322 },
+            { place: "海港城", location: "尖沙咀", lat: 22.2953381, lng: 114.1688303 },
+            { place: "置地廣場", location: "中環", lat: 22.2799907, lng: 114.1587983 },
+            { place: "上水廣場", location: "龍琛路", lat: 22.5025848, lng: 114.1279107 },
+            { place: "朗豪坊", location: "旺角", lat: 22.3182116, lng: 114.1686743 },
+            { place: "荷里活廣場", location: "鑽石山", lat: 22.3405929, lng: 114.2020184 },
+            { place: "時代廣場", location: "銅鑼灣", lat: 22.278151, lng: 114.1821136 },
+            { place: "西港城", location: "上環", lat: 22.287287, lng: 114.150392 },
+            { place: "黃埔新天地", location: "紅磡", lat: 22.3047243, lng: 114.1903547 },
+            { place: "元創方", location: "鴨巴甸街", lat: 22.2834497, lng: 114.1517343 },
+            { place: "世貿中心", location: "告士打道", lat: 22.2819499, lng: 114.1841731 },
+            { place: "K11購物藝術館", location: "河內道", lat: 22.297525, lng: 114.1736355 },
+            { place: "青衣城", location: "青敬路", lat: 22.3584265, lng: 114.1081419 },
+            { place: "新城市廣場", location: "沙田", lat: 22.3817578, lng: 114.1886372 },
+            { place: "奧海城2期", location: "海庭道", lat: 22.3167357, lng: 114.1615929 },
+            { place: "崇光銅鑼灣店", location: "軒尼詩道", lat: 22.2804272, lng: 114.1843032 },
+            { place: "屯門市廣場", location: "屯順街", lat: 22.3929235, lng: 113.9761594 },
+            { place: "中港城", location: "尖沙咀", lat: 22.3005315, lng: 114.1678015 },
+            { place: "東薈城名店倉", location: "東涌", lat: 22.2896486, lng: 113.9405428 },
+            { place: "利舞臺", location: "銅鑼灣", lat: 22.2782879, lng: 114.1831818 },
+            { place: "南豐紗廠", location: "白田壩街", lat: 22.3750707, lng: 114.1101695 },
+            { place: "K11人文購物藝術館", location: "梳士巴利道", lat: 22.2941573, lng: 114.1739272 },
+            { place: "裕民坊", location: "觀塘", lat: 22.3135903, lng: 114.224767 },
+            { place: "AIRSIDE", location: "啟德", lat: 22.331322, lng: 114.198142 },
+            { place: "圍方", location: "車公廟路", lat: 22.3725863, lng: 114.1797535 },
+            { place: "APM", location: "觀塘", lat: 22.312401, lng: 114.225222 },
+            { place: "V Walk", location: "深旺道", lat: 22.3270845, lng: 114.1543942 },
+            { place: "德福花園", location: "偉業街", lat: 22.32237, lng: 114.212493 },
+            { place: "淘大花園", location: "九龍灣", lat: 22.3244614, lng: 114.2163021 },
+            { place: "匯景花園", location: "藍田", lat: 22.3069935, lng: 114.2331127 },
+            { place: "綠楊新邨", location: "荃灣", lat: 22.3723225, lng: 114.1218025 },
+            { place: "盈翠半島", location: "青衣", lat: 22.3582411, lng: 114.1071474 },
+            { place: "港灣豪庭", location: "福利街", lat: 22.3244104, lng: 114.1603631 },
+            { place: "新屯門中心", location: "龍門路", lat: 22.3812677, lng: 113.9643338 },
+            { place: "錦綉花園", location: "元朗", lat: 22.4780591, lng: 114.0443408 },
+            { place: "嘉湖山莊", location: "天水圍", lat: 22.4565729, lng: 114.0023946 },
+            { place: "美孚新邨", location: "荔枝角", lat: 22.3366356, lng: 114.1402195 },
+            { place: "太古城", location: "鰂魚涌", lat: 22.2865471, lng: 114.2189883 },
+            { place: "沙田第一城", location: "小瀝源路", lat: 22.3877476, lng: 114.2044876 },
+            { place: "黃埔花園", location: "紅磡", lat: 22.3037908, lng: 114.1892659 },
+            { place: "海怡半島", location: "鴨脷洲", lat: 22.243373, lng: 114.1476512 },
+            { place: "麗港城", location: "觀塘", lat: 22.30606, lng: 114.2279046 },
+            { place: "愉景灣", location: "大嶼山", lat: 22.2921406, lng: 114.0101467 },
+            { place: "新都城", location: "寶林", lat: 22.3227989, lng: 114.2574486 },
+            { place: "杏花邨", location: "柴灣", lat: 22.2678103, lng: 114.2360778 },
+            { place: "麗城花園", location: "荃灣", lat: 22.3717381, lng: 114.1012016 },
+            { place: "映灣園", location: "東涌", lat: 22.2922883, lng: 113.948814 },
+            { place: "珀麗灣", location: "馬灣", lat: 22.3532151, lng: 114.0614369 },
+            { place: "維景灣畔", location: "調景嶺", lat: 22.3080954, lng: 114.2529567 },
+            { place: "海逸豪園", location: "紅磡", lat: 22.307797, lng: 114.1926098 },
+            { place: "置富花園", location: "薄扶林", lat: 22.2580367, lng: 114.1391702 },
+            { place: "將軍澳中心", location: "唐德街", lat: 22.3074503, lng: 114.2572761 },
+            { place: "大埔中心", location: "安邦路", lat: 22.451529, lng: 114.169121 },
+            { place: "東堤灣畔", location: "東涌", lat: 22.2880911, lng: 113.9398923 },
+            { place: "新港城", location: "馬鞍山", lat: 22.4241643, lng: 114.2318055 },
+            { place: "富榮花園", location: "海庭道", lat: 22.3140442, lng: 114.1629658 },
+            { place: "海山樓", location: "鰂魚涌", lat: 22.2842103, lng: 114.2119759 },
+            { place: "嘉匯", location: "沐寧街", lat: 22.3285812, lng: 114.2012303 },
+            { place: "擎天半島", location: "柯士甸道西", lat: 22.3068099, lng: 114.1615387 },
+            { place: "形點", location: "朗日路", lat: 22.445713, lng: 114.0353169 },
+            { place: "香港恒生大學", location: "小瀝源", lat: 22.3795293, lng: 114.2114767 },
+            { place: "香港城市大學", location: "九龍塘", lat: 22.3370342, lng: 114.17272 },
+            { place: "香港浸會大學", location: "九龍塘", lat: 22.3408088, lng: 114.1798757 },
+            { place: "香港樹仁大學", location: "北角", lat: 22.286178, lng: 114.197825 },
+            { place: "嶺南大學", location: "屯門", lat: 22.4109705, lng: 113.9830974 },
+            { place: "香港中文大學", location: "沙田", lat: 22.419625, lng: 114.2067606 },
+            { place: "香港教育大學", location: "大埔", lat: 22.4670285, lng: 114.1936333 },
+            { place: "香港理工大學", location: "紅磡", lat: 22.3045633, lng: 114.1795767 },
+            { place: "香港科技大學", location: "清水灣", lat: 22.3207164, lng: 114.2713158 },
+            { place: "香港都會大學", location: "何文田", lat: 22.3163552, lng: 114.1801817 },
+            { place: "香港大學本部大樓", location: "般咸道", lat: 22.2840174, lng: 114.1378437 },
+            { place: "聖方濟各大學", location: "翠嶺里", lat: 22.3035509, lng: 114.2507898 }
+        ]
 
         // Route quiz data
         const routeQuizData = [
@@ -691,7 +691,8 @@
         // Get all unique locations for options
         const allLocations = [...new Set(locationQuizData.map(item => item.location))];
         const allRoutes = routeQuizData.map(item => item.route);
-
+        
+        const defaultCoordinate = { lat: 22.302711, lng: 114.177216 }
         // District coordinates
         const districtCoordinates = {
             // Hong Kong Island
@@ -853,9 +854,6 @@
             "銀鑛灣路": { lat: 22.2684, lng: 113.9935 },
             "承豐道": { lat: 22.3044, lng: 114.2164 },
             "親民街": { lat: 22.3817, lng: 114.2739 },
-            
-            // Default to Central Hong Kong
-            "default": { lat: 22.302711, lng: 114.177216 }
         };
 
         // Quiz variables
@@ -1027,17 +1025,17 @@
                         setTimeout(() => {
                             // Coordinates
                             const correctLocationKey = mistake.question.location;
-                            const correctCoords = districtCoordinates[correctLocationKey] || districtCoordinates["default"];
+                            const correctCoords = [mistake.question.lat, mistake.question.lng]
                             
                             // Check if wrong answer exists
-                            const userCoords = mistake.userAnswer && (districtCoordinates[mistake.userAnswer] || districtCoordinates["default"]);
-                            const mistakeMap = L.map(document.getElementById(`mistake-map-${index}`)).setView([correctCoords.lat, correctCoords.lng], 14);
+                            const userCoords = mistake.userAnswer && (districtCoordinates[mistake.userAnswer] || defaultCoordinate);
+                            const mistakeMap = L.map(document.getElementById(`mistake-map-${index}`)).setView(correctCoords, 14);
                             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                                 attribution: '© OpenStreetMap contributors'
                             }).addTo(mistakeMap);
 
                             // Add marker for correct location
-                            const correctMarker = L.marker([correctCoords.lat, correctCoords.lng], {
+                            const correctMarker = L.marker(correctCoords, {
                                 title: `${mistake.question.place}`,
                                 icon: L.divIcon({
                                     className: 'custom-div-icon',
@@ -1049,44 +1047,42 @@
 
                             // Popup for correct location
                             correctMarker.bindPopup(`<div class="p-1">
-                                <strong>${correctLocationKey}${mistake.question.place}</strong>
+                                <strong>${correctLocationKey} - ${mistake.question.place}</strong>
                             </div>`);
 
-                            // Add marker for user's incorrect answer
-                            const incorrectMarker = L.marker([userCoords.lat, userCoords.lng], {
-                                title: `${mistake.question.place} (你的選擇)`,
-                                icon: L.divIcon({
-                                    className: 'custom-div-icon',
-                                    html: `<div style="background-color:#F44336;width:16px;height:16px;border-radius:50%;"></div>`,
-                                    iconSize: [16, 16],
-                                    iconAnchor: [8, 8]
-                                })
-                            }).addTo(mistakeMap);
+                            if (mistake.userAnswer) {
+                                // Add marker for user's incorrect answer
+                                const incorrectMarker = L.marker([userCoords.lat, userCoords.lng], {
+                                    title: `${mistake.question.place} (你的選擇)`,
+                                    icon: L.divIcon({
+                                        className: 'custom-div-icon',
+                                        html: `<div style="background-color:#F44336;width:16px;height:16px;border-radius:50%;"></div>`,
+                                        iconSize: [16, 16],
+                                        iconAnchor: [8, 8]
+                                    })
+                                }).addTo(mistakeMap);
+                                // Popup for incorrect answer
+                                incorrectMarker.bindPopup(`<div class="p-1">
+                                    <strong>${mistake.userAnswer}</strong>
+                                </div>`);
 
-                            // Popup for incorrect answer
-                            incorrectMarker.bindPopup(`<div class="p-1">
-                                <strong>${mistake.userAnswer}</strong>
-                            </div>`);
-
-                            // Fit map to show both locations
-                            const bounds = L.latLngBounds(
-                                [correctCoords.lat, correctCoords.lng],
-                                [userCoords.lat, userCoords.lng]
-                            );
-                            mistakeMap.fitBounds(bounds);
-
-                            // Open both popups
+                                // Fit map to show both locations
+                                const bounds = L.latLngBounds(
+                                    correctCoords,
+                                    [userCoords.lat, userCoords.lng]
+                                );
+                                mistakeMap.fitBounds(bounds)
+                                //mistakeMap.zoomOut(1);
+                            }
+                            
                             setTimeout(() => {
                                 correctMarker.openPopup();
-                                setTimeout(() => {
-                                    incorrectMarker.openPopup();
-                                }, 200);
                             }, 500);
                         }, 200 + (index * 100)); // Stagger map creation
                     }
                     
                     mistakeDiv.appendChild(gridDiv);
-                    mistakesList.appendChild(mistakeDiv);
+                    mistakesList.prepend(mistakeDiv);
                 });
             }
         }
@@ -1427,22 +1423,22 @@
             
             // Get the specific district or street coordinates for the correct answer
             const correctLocationKey = currentQuestion.location;
-            const correctCoords = districtCoordinates[correctLocationKey] || districtCoordinates["default"];
+            const correctCoords = [currentQuestion.lat, currentQuestion.lng] || defaultCoordinate;
             
             // Get the user's answer if there is one and it's incorrect
             const userAnswer = userAnswers[currentQuestionIndex];
             const isIncorrect = userAnswer !== null && userAnswer !== correctLocationKey;
-            const userCoords = isIncorrect ? (districtCoordinates[userAnswer] || districtCoordinates["default"]) : null;
+            const userCoords = isIncorrect ? (districtCoordinates[userAnswer] || defaultCoordinate) : null;
             
             // If map doesn't exist, create it
             if (!map) {
-                map = L.map(mapElement).setView([correctCoords.lat, correctCoords.lng], 15);
+                map = L.map(mapElement).setView(correctCoords, 15);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap contributors'
                 }).addTo(map);
             } else {
                 // Otherwise just update the center
-                map.setView([correctCoords.lat, correctCoords.lng], 15);
+                map.setView(correctCoords, 15);
                 
                 // Clear any existing markers
                 map.eachLayer(function(layer) {
@@ -1455,7 +1451,7 @@
             // If we're showing both locations (incorrect answer scenario)
             if (isIncorrect && userCoords) {
                 // Add marker for correct location (green)
-                const correctMarker = L.marker([correctCoords.lat, correctCoords.lng], {
+                const correctMarker = L.marker(correctCoords, {
                     title: `${currentQuestion.place} (正確位置)`,
                     icon: L.divIcon({
                         className: 'custom-div-icon',
@@ -1478,14 +1474,15 @@
                 
                 // Fit map to show both markers
                 const bounds = L.latLngBounds(
-                    [correctCoords.lat, correctCoords.lng],
+                    correctCoords,
                     [userCoords.lat, userCoords.lng]
                 );
                 map.fitBounds(bounds);
+                //map.zoomOut(1);
                 
                 // Add popups
                 correctMarker.bindPopup(`<div class="p-2">
-                    <strong>${correctLocationKey}${currentQuestion.place}</strong><br>
+                    <strong>${correctLocationKey}</strong> - ${currentQuestion.place}<br>
                     <span class="text-green-600">✓ 正確位置</span>
                 </div>`);
                 
@@ -1505,19 +1502,20 @@
                 
             } else {
                 // Just show the correct location
-                const marker = L.marker([correctCoords.lat, correctCoords.lng], {
+                const marker = L.marker(correctCoords, {
                     title: currentQuestion.place
                 }).addTo(map);
                 
                 // Add popup with location
                 marker.bindPopup(`<div class="p-2">
-                    <strong>${correctLocationKey}${currentQuestion.place}</strong>
+                    <strong>${correctLocationKey}</strong> - ${currentQuestion.place}
                 </div>`);
-                
+
                 // Automatically open popup
                 setTimeout(() => {
                     marker.openPopup();
                 }, 500);
+
             }
             
             // Trigger resize event to ensure map renders correctly
@@ -1643,20 +1641,20 @@
                     setTimeout(() => {
                         // Coordinates
                         const correctLocationKey = question.location;
-                        const correctCoords = districtCoordinates[correctLocationKey] || districtCoordinates["default"];
+                        const correctCoords = [question.lat, question.lng] || defaultCoordinate;
                         
                         // Check if wrong answer exists
                         const isIncorrect = userAnswer !== null && userAnswer !== correctLocationKey;
-                        const userCoords = isIncorrect ? (districtCoordinates[userAnswer] || districtCoordinates["default"]) : null;
+                        const userCoords = isIncorrect ? (districtCoordinates[userAnswer] || defaultCoordinate) : null;
                         
                         // Create map
-                        const summaryMap = L.map(document.getElementById(`summary-map-${index}`)).setView([correctCoords.lat, correctCoords.lng], 14);
+                        const summaryMap = L.map(document.getElementById(`summary-map-${index}`)).setView(correctCoords, 14);
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                             attribution: '© OpenStreetMap contributors'
                         }).addTo(summaryMap);
                         
                         // Add marker for correct location
-                        const correctMarker = L.marker([correctCoords.lat, correctCoords.lng], {
+                        const correctMarker = L.marker(correctCoords, {
                             title: `${question.place}`
                         });
                         
@@ -1694,10 +1692,11 @@
                             
                             // Fit map to show both locations
                             const bounds = L.latLngBounds(
-                                [correctCoords.lat, correctCoords.lng],
+                                correctCoords,
                                 [userCoords.lat, userCoords.lng]
                             );
-                            summaryMap.fitBounds(bounds);
+                            summaryMap.fitBounds(bounds)
+                            //summaryMap.zoomOut(1);
                             
                             // Open both popups
                             setTimeout(() => {
