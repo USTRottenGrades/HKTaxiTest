@@ -112,13 +112,15 @@
         <!-- Summary Container -->
         <div id="summary-container" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h2 class="text-2xl font-bold mb-4 text-center">測驗總覽</h2>
-            <p class="text-lg mb-6 text-center">你的最終分數: <span id="summary-score" class="font-bold">0</span>/<span id="summary-total" class="font-bold">0</span></p>
+            <p class="text-lg text-center">你的最終分數: <span id="summary-score" class="font-bold">0</span>/<span id="summary-total" class="font-bold">0</span></p>
+
+            <button id="summary-back-btn0" class="mt-6 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 w-full  mb-6">返回選擇測驗類型</button>
             
             <div id="summary-questions" class="space-y-8">
                 <!-- Questions will be inserted here -->
             </div>
             
-            <button id="summary-back-btn" class="mt-6 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 w-full">返回選擇測驗類型</button>
+            <button id="summary-back-btn1" class="mt-6 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 w-full">返回選擇測驗類型</button>
         </div>
 
         <!-- Mistakes Review Container -->
@@ -137,19 +139,24 @@
                 </div>
             </div>
 
+            <div id="top-mistakes-bar" class="flex justify-between mt-6 gap-3 mb-6">
+                <button class="mistakes-back-btn px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex-1">返回選擇測驗類型</button>
+                <button class="clear-mistakes-btn px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 flex-1">清除所有記錄</button>
+            </div>
+
             <p id="no-mistakes-msg" class="text-center py-8 text-gray-500 italic hidden">目前沒有錯誤記錄</p>
             <div id="mistakes-list" class="space-y-6"></div>
             
             <div class="flex justify-between mt-6 gap-3">
-                <button id="mistakes-back-btn" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex-1">返回選擇測驗類型</button>
-                <button id="clear-mistakes-btn" class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 flex-1">清除所有記錄</button>
+                <button class="mistakes-back-btn px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex-1">返回選擇測驗類型</button>
+                <button class="clear-mistakes-btn px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 flex-1">清除所有記錄</button>
             </div>
         </div>
 
         <div class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
             <p>根據的士筆試乙部試題（地方及路線）設計</p>
             <p class="mt-2">
-                <a href="%E7%9A%84%E5%A3%AB%E5%89%87%E4%BE%8B%E7%B0%A1%E4%BB%8B_combined.pdf" target="_blank" class="text-primary hover:underline">按此</a>下載改良版的士則例簡介<br>
+                <strong><a href="%E7%9A%84%E5%A3%AB%E5%89%87%E4%BE%8B%E7%B0%A1%E4%BB%8B_combined.pdf" target="_blank" class="text-primary hover:underline">按此</a>下載改良版的士則例簡介</strong><br>
                 改良版的士則例簡介取材自運輸處文件，由原先的直向排版改為橫向，更便於閲讀<br>
                 請參閲運輸處網站以獲取最新版本
             </p>
@@ -945,6 +952,7 @@
             const mistakesContainer = document.getElementById('mistakes-container');
             const mistakesList = document.getElementById('mistakes-list');
             const noMistakesMsg = document.getElementById('no-mistakes-msg');
+            const topMistakesBar = document.getElementById('top-mistakes-bar');
             
             // Show container
             quizSelection.classList.add('hidden');
@@ -968,8 +976,10 @@
             // Show message if no mistakes
             if (filteredMistakes.length === 0) {
                 noMistakesMsg.classList.remove('hidden');
+                topMistakesBar.classList.add('hidden');
             } else {
                 noMistakesMsg.classList.add('hidden');
+                topMistakesBar.classList.remove('hidden');
                 
                 // Create entries for each mistake
                 filteredMistakes.forEach((mistake, index) => {
@@ -1077,8 +1087,8 @@
                             
                             setTimeout(() => {
                                 correctMarker.openPopup();
-                            }, 500);
-                        }, 200 + (index * 100)); // Stagger map creation
+                            }, 100);
+                        }, 100 + (index * 50)); // Stagger map creation
                     }
                     
                     mistakeDiv.appendChild(gridDiv);
@@ -1117,8 +1127,10 @@
         
         // Event listeners for mistakes review
         document.getElementById('review-mistakes-btn').addEventListener('click', showMistakes);
-        document.getElementById('mistakes-back-btn').addEventListener('click', backToSelection);
-        document.getElementById('clear-mistakes-btn').addEventListener('click', clearMistakes);
+        document.getElementsByClassName('mistakes-back-btn')[0].addEventListener('click', backToSelection);
+        document.getElementsByClassName('clear-mistakes-btn')[0].addEventListener('click', clearMistakes);
+        document.getElementsByClassName('mistakes-back-btn')[1].addEventListener('click', backToSelection);
+        document.getElementsByClassName('clear-mistakes-btn')[1].addEventListener('click', clearMistakes);
         
         // Filters for mistakes
         document.getElementById('show-location').addEventListener('change', showMistakes);
@@ -1237,7 +1249,11 @@
             const questionElement = document.getElementById('question');
             
             // Hide map container when loading a new question
-            mapContainer.classList.add('hidden');
+            if (userAnswers[currentQuestionIndex]) { // Answered
+                mapContainer.classList.remove('hidden');
+            } else {
+                mapContainer.classList.add('hidden');
+            }
             
             // Set question text based on quiz type
             if (currentQuizType === 'location') {
@@ -1495,9 +1511,9 @@
                 setTimeout(() => {
                     correctMarker.openPopup();
                     // Slight delay for second window to avoid overlap/flickering
-                    setTimeout(() => {
+                    /*setTimeout(() => {
                         incorrectMarker.openPopup();
-                    }, 300);
+                    }, 300);*/
                 }, 500);
                 
             } else {
@@ -1620,8 +1636,8 @@
                     addMistake(question, userAnswer)
 
                 } else if (isCorrect) {
-                    userAnswerEl.className = 'text-green-600 dark:text-green-400';
-                    userAnswerEl.innerHTML = `<strong>你的答案:</strong> ${userAnswer}`;
+                    //userAnswerEl.className = 'text-green-600 dark:text-green-400';
+                    //userAnswerEl.innerHTML = `<strong>你的答案:</strong> ${userAnswer}`;
                 } else {
                     userAnswerEl.className = 'text-red-600 dark:text-red-400';
                     userAnswerEl.innerHTML = `<strong>你的答案:</strong> ${userAnswer}`;
@@ -1670,7 +1686,7 @@
                         
                         // Popup for correct location
                         correctMarker.bindPopup(`<div class="p-1">
-                            <strong>${correctLocationKey}${question.place}</strong>
+                            <strong>${correctLocationKey}</strong> - ${question.place}
                         </div>`);
                         
                         // If user answer is incorrect, show that marker too
@@ -1701,9 +1717,9 @@
                             // Open both popups
                             setTimeout(() => {
                                 correctMarker.openPopup();
-                                setTimeout(() => {
+                                /*setTimeout(() => {
                                     incorrectMarker.openPopup();
-                                }, 200);
+                                }, 200);*/
                             }, 500);
                         } else {
                             // Just open the correct location popup
@@ -1730,7 +1746,8 @@
         // Add event listeners
         document.getElementById('exit-btn').addEventListener('click', backToSelection);
         document.getElementById('submit-btn').addEventListener('click', showSummary);
-        document.getElementById('summary-back-btn').addEventListener('click', backToSelection);
+        document.getElementById('summary-back-btn0').addEventListener('click', backToSelection);
+        document.getElementById('summary-back-btn1').addEventListener('click', backToSelection);
         skipButton.addEventListener('click', skipQuestion);
         nextButton.addEventListener('click', nextQuestion);
         prevButton.addEventListener('click', prevQuestion);
