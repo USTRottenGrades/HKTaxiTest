@@ -11,9 +11,9 @@ https://ustrottengrades.github.io/HKTaxiTest
 
 
 ## Todo:
-- [] Optimize prev mistakes by removing only the affected portions (otherwise frequent map loading)
-- [] Optimize prev mistakes sorting method (add count)
-- [] Modify 'loc' type questions such that the options will be fixed upon entering
-- [] Optimize 'route' type questions
-  - [] Add navigation lines
-  - [] Add & randomize realistic options
+- [ ] Optimize prev mistakes by removing only the affected portions (otherwise frequent map loading)
+- [ ] Optimize prev mistakes sorting method (add count)
+- [ ] Modify 'loc' type questions such that the options will be fixed upon entering
+- [ ] Optimize 'route' type questions
+  - [ ] Add navigation lines
+  - [ ] Add & randomize realistic options
