@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="zh-HK"><head>
+<!DOCTYPE html><html lang="zh-HK">
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>香港的士考試溫習 | Hong Kong Taxi Exam Quiz</title>
@@ -23,12 +24,18 @@
             border-radius: 0.5rem;
             overflow: hidden;
         }
+        .summary-map {
+            height: 200px;
+            width: 100%;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 min-h-screen">
     <div class="container mx-auto px-4 py-8 max-w-3xl">
         <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold mb-2 text-primary"><button script="window.location.href = window.location.href;">香港的士考試溫習</button></h1>
+            <h1 class="text-3xl font-bold mb-2 text-primary"><button onclick="window.location.href = window.location.href;">香港的士考試溫習</button></h1>
             <h2 class="text-xl mb-4">Hong Kong Taxi Exam Practice</h2>
             <p class="text-sm text-gray-600 dark:text-gray-400">基於的士筆試地方及路線試題小冊子</p>
         </header>
@@ -36,7 +43,7 @@
         <!-- Quiz Type Selection Screen -->
         <div id="quiz-selection" class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
             <h2 class="text-2xl font-bold mb-6 text-center">選擇測驗類型</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <button id="location-quiz-btn" class="p-6 bg-white dark:bg-gray-700 rounded-lg shadow hover:shadow-md border-2 border-primary flex flex-col items-center justify-center transition-all">
                     <span class="text-3xl mb-2">🏢</span>
                     <h3 class="text-xl font-bold mb-2">地方問題</h3>
@@ -48,6 +55,15 @@
                     <p class="text-sm text-center">測試你對香港主要路線的認識</p>
                 </button>
             </div>
+            
+            <!-- Mistakes Review Button -->
+            <button id="review-mistakes-btn" class="w-full p-4 bg-amber-500 hover:bg-amber-600 text-white rounded-lg flex items-center justify-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                <span>查看以往錯誤</span>
+                <span id="mistakes-count" class="bg-white text-amber-600 rounded-full h-5 min-w-5 px-1 text-xs flex items-center justify-center">0</span>
+            </button>
         </div>
 
         <!-- Quiz Container -->
@@ -81,10 +97,14 @@
                 <div id="map" class="map-container"></div>
             </div>
 
-            <div class="flex justify-between">
-                <button id="prev-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50">Previous</button>
-                <button id="skip-btn" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600">Skip</button>
-                <button id="next-btn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90">Next</button>
+            <div class="flex justify-between flex-wrap gap-3">
+                <button id="exit-btn" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">返回選單</button>
+                <div class="flex space-x-2">
+                    <button id="prev-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50">Previous</button>
+                    <button id="skip-btn" class="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:opacity-50">Skip</button>
+                    <button id="next-btn" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-opacity-90 disabled:opacity-50">Next</button>
+                </div>
+                <button id="submit-btn" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">提交測驗</button>
             </div>
         </div>
 
@@ -99,6 +119,43 @@
             </div>
             
             <button id="back-to-selection-btn" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 w-full">返回選擇測驗類型</button>
+        </div>
+
+        <!-- Summary Container -->
+        <div id="summary-container" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-center">測驗總覽</h2>
+            <p class="text-lg mb-6 text-center">你的最終分數: <span id="summary-score" class="font-bold">0</span>/<span id="summary-total" class="font-bold">0</span></p>
+            
+            <div id="summary-questions" class="space-y-8">
+                <!-- Questions will be inserted here -->
+            </div>
+            
+            <button id="summary-back-btn" class="mt-6 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 w-full">返回選擇測驗類型</button>
+        </div>
+
+        <!-- Mistakes Review Container -->
+        <div id="mistakes-container" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">以往錯誤</h2>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1">
+                        <input type="checkbox" id="show-location" class="w-4 h-4" checked="">
+                        <label for="show-location" class="text-sm">地方問題</label>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <input type="checkbox" id="show-route" class="w-4 h-4" checked="">
+                        <label for="show-route" class="text-sm">路線問題</label>
+                    </div>
+                </div>
+            </div>
+
+            <p id="no-mistakes-msg" class="text-center py-8 text-gray-500 italic hidden">目前沒有錯誤記錄</p>
+            <div id="mistakes-list" class="space-y-6"></div>
+            
+            <div class="flex justify-between mt-6 gap-3">
+                <button id="mistakes-back-btn" class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 flex-1">返回選擇測驗類型</button>
+                <button id="clear-mistakes-btn" class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 flex-1">清除所有記錄</button>
+            </div>
         </div>
 
         <div class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
@@ -822,10 +879,261 @@
         let quizQuestions = [];
         let incorrectQuestions = [];
 
+        // Mistakes storage - use localStorage to persist between sessions
+        let savedMistakes = [];
+
+        // Load saved mistakes from localStorage
+        function loadSavedMistakes() {
+            try {
+                const storedMistakes = localStorage.getItem('taxiQuizMistakes');
+                if (storedMistakes) {
+                    savedMistakes = JSON.parse(storedMistakes);
+                    updateMistakesCount();
+                }
+            } catch (e) {
+                console.error("Error loading saved mistakes:", e);
+                savedMistakes = [];
+            }
+        }
+
+        // Save mistakes to localStorage
+        function saveMistakesToStorage() {
+            try {
+                localStorage.setItem('taxiQuizMistakes', JSON.stringify(savedMistakes));
+                updateMistakesCount();
+            } catch (e) {
+                console.error("Error saving mistakes:", e);
+            }
+        }
+
+        // Update the mistakes count in the menu
+        function updateMistakesCount() {
+            const countElement = document.getElementById('mistakes-count');
+            if (countElement) {
+                countElement.textContent = savedMistakes.length;
+            }
+        }
+
+        // Add a new mistake to the saved list (ensure no duplicates)
+        function addMistake(question, userAnswer) {
+            // Create a unique ID for the question to avoid duplicates
+            let questionId;
+            
+            if (question.hasOwnProperty('place')) {
+                // Location question
+                questionId = `location-${question.place}`;
+            } else {
+                // Route question
+                questionId = `route-${question.startPoint}-${question.endPoint}`;
+            }
+            
+            // Check if this question is already in the saved mistakes
+            const existingIndex = savedMistakes.findIndex(item => item.id === questionId);
+            
+            if (existingIndex !== -1) {
+                // Update existing mistake with the newest answer
+                savedMistakes[existingIndex].userAnswer = userAnswer;
+            } else {
+                // Add new mistake
+                savedMistakes.push({
+                    id: questionId,
+                    question: question,
+                    userAnswer: userAnswer,
+                    type: question.hasOwnProperty('place') ? 'location' : 'route',
+                    timestamp: new Date().toISOString()
+                });
+            }
+            
+            // Save to localStorage
+            saveMistakesToStorage();
+        }
+
+        // Clear all saved mistakes
+        function clearMistakes() {
+            savedMistakes = [];
+            saveMistakesToStorage();
+            showMistakes(); // Refresh the mistakes view
+        }
+
+        // Show mistakes in the mistakes container
+        function showMistakes() {
+            const mistakesContainer = document.getElementById('mistakes-container');
+            const mistakesList = document.getElementById('mistakes-list');
+            const noMistakesMsg = document.getElementById('no-mistakes-msg');
+            
+            // Show container
+            quizSelection.classList.add('hidden');
+            quizContainer.classList.add('hidden');
+            summaryContainer.classList.add('hidden');
+            mistakesContainer.classList.remove('hidden');
+            
+            // Clear the list
+            mistakesList.innerHTML = '';
+            
+            // Get filter settings
+            const showLocation = document.getElementById('show-location').checked;
+            const showRoute = document.getElementById('show-route').checked;
+            
+            // Filter mistakes based on settings
+            const filteredMistakes = savedMistakes.filter(mistake => 
+                (showLocation && mistake.type === 'location') || 
+                (showRoute && mistake.type === 'route')
+            );
+            
+            // Show message if no mistakes
+            if (filteredMistakes.length === 0) {
+                noMistakesMsg.classList.remove('hidden');
+            } else {
+                noMistakesMsg.classList.add('hidden');
+                
+                // Create entries for each mistake
+                filteredMistakes.forEach((mistake, index) => {
+                    const mistakeDiv = document.createElement('div');
+                    mistakeDiv.className = 'p-4 rounded-lg border border-red-500 bg-red-50 dark:bg-red-900/20';
+                    mistakeDiv.setAttribute('data-mistake-id', mistake.id);
+                    
+                    // Create grid for question and map (for location questions)
+                    const gridDiv = document.createElement('div');
+                    gridDiv.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
+                    
+                    // Question info
+                    const questionInfo = document.createElement('div');
+                    questionInfo.className = 'md:col-span-2';
+                    
+                    // Question header
+                    const questionHeader = document.createElement('h3');
+                    questionHeader.className = 'text-lg font-bold mb-2';
+                    
+                    if (mistake.type === 'location') {
+                        questionHeader.textContent = mistake.question.place;
+                    } else {
+                        questionHeader.textContent = `${mistake.question.startPoint} → ${mistake.question.endPoint}`;
+                    }
+                    questionInfo.appendChild(questionHeader);
+                    
+                    // Correct answer
+                    const correctAnswer = document.createElement('p');
+                    correctAnswer.className = 'text-green-600 dark:text-green-400 mb-1';
+                    if (mistake.type === 'location') {
+                        correctAnswer.innerHTML = `<strong>正確答案:</strong> ${mistake.question.location}`;
+                    } else {
+                        correctAnswer.innerHTML = `<strong>正確答案:</strong> ${mistake.question.route}`;
+                    }
+                    questionInfo.appendChild(correctAnswer);
+                    
+                    // User answer
+                    const userAnswerEl = document.createElement('p');
+                    userAnswerEl.className = 'text-red-600 dark:text-red-400';
+                    userAnswerEl.innerHTML = `<strong>你的答案:</strong> ${mistake.userAnswer}`;
+                    questionInfo.appendChild(userAnswerEl);
+                    
+                    gridDiv.appendChild(questionInfo);
+                    
+                    // Add map for location questions
+                    if (mistake.type === 'location') {
+                        const mapDiv = document.createElement('div');
+                        mapDiv.className = 'summary-map';
+                        mapDiv.id = `mistake-map-${index}`;
+                        gridDiv.appendChild(mapDiv);
+                        
+                        // Set timeout to create map after DOM has been updated
+                        setTimeout(() => {
+                            // Coordinates
+                            const correctLocationKey = mistake.question.location;
+                            const correctCoords = districtCoordinates[correctLocationKey] || districtCoordinates["default"];
+                            
+                            // Check if wrong answer exists
+                            const userCoords = districtCoordinates[mistake.userAnswer] || districtCoordinates["default"];
+                            
+                            // Create map
+                            const mistakeMap = new google.maps.Map(document.getElementById(`mistake-map-${index}`), {
+                                center: correctCoords,
+                                zoom: 14,
+                                mapTypeId: 'roadmap',
+                                mapTypeControl: false,
+                                streetViewControl: false,
+                                fullscreenControl: false
+                            });
+                            
+                            // Add marker for correct location
+                            const correctMarker = new google.maps.Marker({
+                                position: correctCoords,
+                                map: mistakeMap,
+                                title: `${mistake.question.place}`,
+                                animation: google.maps.Animation.DROP,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    fillColor: '#4CAF50',
+                                    fillOpacity: 1,
+                                    strokeWeight: 0,
+                                    scale: 8
+                                }
+                            });
+                            
+                            // Info window for correct location
+                            const correctInfoWindow = new google.maps.InfoWindow({
+                                content: `<div class="p-1">
+                                    <strong>${correctLocationKey}${mistake.question.place}</strong>
+                                </div>`
+                            });
+                            
+                            correctMarker.addListener('click', () => {
+                                correctInfoWindow.open(mistakeMap, correctMarker);
+                            });
+                            
+                            // Add marker for user's incorrect answer
+                            const incorrectMarker = new google.maps.Marker({
+                                position: userCoords,
+                                map: mistakeMap,
+                                title: `${mistake.question.place} (你的選擇)`,
+                                animation: google.maps.Animation.DROP,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    fillColor: '#F44336',
+                                    fillOpacity: 1,
+                                    strokeWeight: 0,
+                                    scale: 8
+                                }
+                            });
+                            
+                            // Info window for incorrect answer
+                            const incorrectInfoWindow = new google.maps.InfoWindow({
+                                content: `<div class="p-1">
+                                    <strong>${mistake.userAnswer}</strong>
+                                </div>`
+                            });
+                            
+                            incorrectMarker.addListener('click', () => {
+                                incorrectInfoWindow.open(mistakeMap, incorrectMarker);
+                            });
+                            
+                            // Fit map to show both locations
+                            const bounds = new google.maps.LatLngBounds();
+                            bounds.extend(correctCoords);
+                            bounds.extend(userCoords);
+                            mistakeMap.fitBounds(bounds);
+                            
+                            // Open both info windows
+                            setTimeout(() => {
+                                correctInfoWindow.open(mistakeMap, correctMarker);
+                                setTimeout(() => {
+                                    incorrectInfoWindow.open(mistakeMap, incorrectMarker);
+                                }, 200);
+                            }, 500);
+                        }, 200 + (index * 100)); // Stagger map creation
+                    }
+                    
+                    mistakeDiv.appendChild(gridDiv);
+                    mistakesList.appendChild(mistakeDiv);
+                });
+            }
+        }
+
         // DOM elements
         const quizSelection = document.getElementById('quiz-selection');
         const quizContainer = document.getElementById('quiz-container');
-        const resultsContainer = document.getElementById('results-container');
+        const summaryContainer = document.getElementById('summary-container');
+        const mistakesContainer = document.getElementById('mistakes-container');
         
         const questionContainer = document.getElementById('question-container');
         const optionsContainer = document.getElementById('options-container');
@@ -854,6 +1162,15 @@
         document.getElementById('route-quiz-btn').addEventListener('click', () => {
             startQuiz('route');
         });
+        
+        // Event listeners for mistakes review
+        document.getElementById('review-mistakes-btn').addEventListener('click', showMistakes);
+        document.getElementById('mistakes-back-btn').addEventListener('click', backToSelection);
+        document.getElementById('clear-mistakes-btn').addEventListener('click', clearMistakes);
+        
+        // Filters for mistakes
+        document.getElementById('show-location').addEventListener('change', showMistakes);
+        document.getElementById('show-route').addEventListener('change', showMistakes);
 
         // Function to shuffle array
         function shuffleArray(array) {
@@ -872,7 +1189,8 @@
             // Hide selection, show quiz
             quizSelection.classList.add('hidden');
             quizContainer.classList.remove('hidden');
-            resultsContainer.classList.add('hidden');
+            summaryContainer.classList.add('hidden');
+            mistakesContainer.classList.add('hidden');
             
             // Select and shuffle questions based on quiz type
             if (quizType === 'location') {
@@ -987,7 +1305,8 @@
             
             // Handle buttons state
             prevButton.disabled = currentQuestionIndex === 0;
-            nextButton.disabled = currentQuestionIndex === quizQuestions.length - 1 && userAnswers[currentQuestionIndex] !== null;
+            nextButton.disabled = currentQuestionIndex === quizQuestions.length - 1;
+            skipButton.disabled = currentQuestionIndex === quizQuestions.length - 1;
             
             // Hide feedback
             feedbackElement.classList.add('hidden');
@@ -1092,6 +1411,9 @@
             } else {
                 // Track incorrect questions for review
                 incorrectQuestions.push(currentQuestionIndex);
+                
+                // Save to mistakes history if incorrect
+                addMistake(currentQuestion, selectedOption);
             }
             
             // Show feedback
@@ -1299,11 +1621,9 @@
 
         // Go to next question
         function nextQuestion() {
-            if (currentQuestionIndex < quizQuestions.length - 1) {
+            if (currentQuestionIndex < 19) {
                 currentQuestionIndex++;
                 loadQuestion();
-            } else if (allQuestionsAnswered()) {
-                endQuiz();
             }
         }
 
@@ -1320,25 +1640,193 @@
             return userAnswers.every(answer => answer !== null);
         }
 
-        // End quiz
-        function endQuiz() {
+        // Show summary view
+        function showSummary() {
+            // Hide quiz container and results container
             quizContainer.classList.add('hidden');
-            resultsContainer.classList.remove('hidden');
-            finalScoreElement.textContent = score;
-            finalTotalElement.textContent = questionsPerQuiz;
+            mistakesContainer.classList.add('hidden');
             
-            // Disable review button if all answers are correct
-            reviewButton.disabled = incorrectQuestions.length === 0;
-            if (incorrectQuestions.length === 0) {
-                reviewButton.classList.add('opacity-50', 'cursor-not-allowed');
-            }
+            // Show summary container
+            summaryContainer.classList.remove('hidden');
+            
+            // Update score display
+            document.getElementById('summary-score').textContent = score;
+            document.getElementById('summary-total').textContent = quizQuestions.length;
+            
+            // Get the summary questions container
+            const summaryQuestionsContainer = document.getElementById('summary-questions');
+            summaryQuestionsContainer.innerHTML = '';
+            
+            // Add each question to the summary
+            quizQuestions.forEach((question, index) => {
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer !== null && isAnswerCorrect(index);
+                
+                // Create question container
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'p-4 rounded-lg border ' + 
+                    (isCorrect ? 'border-green-500 bg-green-50 dark:bg-green-900/20' : 
+                     userAnswer === null ? 'border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20' : 
+                     'border-red-500 bg-red-50 dark:bg-red-900/20');
+                
+                // Create grid for question and map
+                const gridDiv = document.createElement('div');
+                gridDiv.className = 'grid grid-cols-1 md:grid-cols-3 gap-4';
+                
+                // Question info
+                const questionInfo = document.createElement('div');
+                questionInfo.className = 'md:col-span-2';
+                
+                // Question number and content
+                const questionHeader = document.createElement('h3');
+                questionHeader.className = 'text-lg font-bold mb-2';
+                
+                if (currentQuizType === 'location') {
+                    questionHeader.textContent = `題目 ${index + 1}: ${question.place}`;
+                } else {
+                    questionHeader.textContent = `題目 ${index + 1}: ${question.startPoint} → ${question.endPoint}`;
+                }
+                questionInfo.appendChild(questionHeader);
+                
+                // Correct answer
+                const correctAnswer = document.createElement('p');
+                correctAnswer.className = 'text-green-600 dark:text-green-400 mb-1';
+                if (currentQuizType === 'location') {
+                    correctAnswer.innerHTML = `<strong>正確答案:</strong> ${question.location}`;
+                } else {
+                    correctAnswer.innerHTML = `<strong>正確答案:</strong> ${question.route}`;
+                }
+                questionInfo.appendChild(correctAnswer);
+                
+                // User answer
+                const userAnswerEl = document.createElement('p');
+                if (userAnswer === null) {
+                    userAnswerEl.className = 'text-yellow-600 dark:text-yellow-400';
+                    userAnswerEl.innerHTML = '<strong>你的答案:</strong> 未作答';
+                } else if (isCorrect) {
+                    userAnswerEl.className = 'text-green-600 dark:text-green-400';
+                    userAnswerEl.innerHTML = `<strong>你的答案:</strong> ${userAnswer}`;
+                } else {
+                    userAnswerEl.className = 'text-red-600 dark:text-red-400';
+                    userAnswerEl.innerHTML = `<strong>你的答案:</strong> ${userAnswer}`;
+                }
+                questionInfo.appendChild(userAnswerEl);
+                
+                gridDiv.appendChild(questionInfo);
+                
+                // Map for location quiz
+                if (currentQuizType === 'location') {
+                    const mapDiv = document.createElement('div');
+                    mapDiv.className = 'summary-map';
+                    mapDiv.id = `summary-map-${index}`;
+                    gridDiv.appendChild(mapDiv);
+                    
+                    // Set timeout to create map after DOM has been updated
+                    setTimeout(() => {
+                        // Coordinates
+                        const correctLocationKey = question.location;
+                        const correctCoords = districtCoordinates[correctLocationKey] || districtCoordinates["default"];
+                        
+                        // Check if wrong answer exists
+                        const isIncorrect = userAnswer !== null && userAnswer !== correctLocationKey;
+                        const userCoords = isIncorrect ? (districtCoordinates[userAnswer] || districtCoordinates["default"]) : null;
+                        
+                        // Create map
+                        const summaryMap = new google.maps.Map(document.getElementById(`summary-map-${index}`), {
+                            center: correctCoords,
+                            zoom: 14,
+                            mapTypeId: 'roadmap',
+                            mapTypeControl: false,
+                            streetViewControl: false,
+                            fullscreenControl: false
+                        });
+                        
+                        // Add marker for correct location
+                        const correctMarker = new google.maps.Marker({
+                            position: correctCoords,
+                            map: summaryMap,
+                            title: `${question.place}`,
+                            animation: google.maps.Animation.DROP,
+                            icon: isIncorrect ? {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                fillColor: '#4CAF50',
+                                fillOpacity: 1,
+                                strokeWeight: 0,
+                                scale: 8
+                            } : null
+                        });
+                        
+                        // Info window for correct location
+                        const correctInfoWindow = new google.maps.InfoWindow({
+                            content: `<div class="p-1">
+                                <strong>${correctLocationKey}${question.place}</strong>
+                            </div>`
+                        });
+                        
+                        correctMarker.addListener('click', () => {
+                            correctInfoWindow.open(summaryMap, correctMarker);
+                        });
+                        
+                        // If user answer is incorrect, show that marker too
+                        if (isIncorrect && userCoords) {
+                            const incorrectMarker = new google.maps.Marker({
+                                position: userCoords,
+                                map: summaryMap,
+                                title: `${question.place} (你的選擇)`,
+                                animation: google.maps.Animation.DROP,
+                                icon: {
+                                    path: google.maps.SymbolPath.CIRCLE,
+                                    fillColor: '#F44336',
+                                    fillOpacity: 1,
+                                    strokeWeight: 0,
+                                    scale: 8
+                                }
+                            });
+                            
+                            // Info window for incorrect answer
+                            const incorrectInfoWindow = new google.maps.InfoWindow({
+                                content: `<div class="p-1">
+                                    <strong>${userAnswer}</strong>
+                                </div>`
+                            });
+                            
+                            incorrectMarker.addListener('click', () => {
+                                incorrectInfoWindow.open(summaryMap, incorrectMarker);
+                            });
+                            
+                            // Fit map to show both locations
+                            const bounds = new google.maps.LatLngBounds();
+                            bounds.extend(correctCoords);
+                            bounds.extend(userCoords);
+                            summaryMap.fitBounds(bounds);
+                            
+                            // Open both info windows
+                            setTimeout(() => {
+                                correctInfoWindow.open(summaryMap, correctMarker);
+                                setTimeout(() => {
+                                    incorrectInfoWindow.open(summaryMap, incorrectMarker);
+                                }, 200);
+                            }, 500);
+                        } else {
+                            // Just open the correct location info window
+                            setTimeout(() => {
+                                correctInfoWindow.open(summaryMap, correctMarker);
+                            }, 500);
+                        }
+                    }, 200 + (index * 100)); // Stagger map creation to prevent too many simultaneous requests
+                }
+                
+                questionDiv.appendChild(gridDiv);
+                summaryQuestionsContainer.appendChild(questionDiv);
+            });
         }
 
         // Review incorrect answers
         function reviewIncorrectAnswers() {
             if (incorrectQuestions.length > 0) {
-                resultsContainer.classList.add('hidden');
                 quizContainer.classList.remove('hidden');
+                summaryContainer.classList.add('hidden');
+                mistakesContainer.classList.add('hidden');
                 
                 // Go to the first incorrect question
                 currentQuestionIndex = incorrectQuestions[0];
@@ -1348,18 +1836,25 @@
 
         // Reset to selection screen
         function backToSelection() {
-            resultsContainer.classList.add('hidden');
             quizContainer.classList.add('hidden');
+            summaryContainer.classList.add('hidden');
+            mistakesContainer.classList.add('hidden');
             quizSelection.classList.remove('hidden');
         }
 
         // Add event listeners
+        document.getElementById('exit-btn').addEventListener('click', backToSelection);
+        document.getElementById('submit-btn').addEventListener('click', showSummary);
+        document.getElementById('summary-back-btn').addEventListener('click', backToSelection);
         skipButton.addEventListener('click', skipQuestion);
         nextButton.addEventListener('click', nextQuestion);
         prevButton.addEventListener('click', prevQuestion);
         restartButton.addEventListener('click', () => startQuiz(currentQuizType));
         reviewButton.addEventListener('click', reviewIncorrectAnswers);
         backToSelectionButton.addEventListener('click', backToSelection);
+        
+        // Initialize by loading saved mistakes
+        loadSavedMistakes();
     </script>
 
 
